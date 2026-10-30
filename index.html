@@ -36,7 +36,7 @@
             z-index: 1;
         }
 
-        /* Custom scrollbar */
+        /* Custom scrollbar & scrollbar hider */
         ::-webkit-scrollbar {
             width: 4px;
             height: 4px;
@@ -44,6 +44,14 @@
         ::-webkit-scrollbar-thumb {
             background: #00A8CC;
             border-radius: 4px;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
 
         /* Leaflet custom marker pulse animation */
@@ -88,62 +96,62 @@
 <body class="bg-white text-[#4A4A4A] flex flex-col h-screen overflow-hidden select-none">
 
     <!-- Top App Bar (Android Header Style - Kop Biru Google #1A73E8) -->
-    <header class="bg-[#1A73E8] fixed top-0 left-0 right-0 z-50 px-4 py-3 flex items-center justify-between border-b border-blue-400/20 shadow-md">
-        <div class="flex items-center space-x-3">
-            <div class="w-9 h-9 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center text-white font-bold text-lg shadow-inner">
+    <header class="bg-[#1A73E8] fixed top-0 left-0 right-0 z-50 px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between border-b border-blue-400/20 shadow-md min-w-0 gap-2">
+        <div class="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center text-white font-bold text-base sm:text-lg shadow-inner shrink-0">
                 <i class="fa-solid fa-map-location-dot"></i>
             </div>
-            <div>
-                <h1 class="text-base font-bold tracking-wide text-white leading-tight">Ayo ke Malang!</h1>
-                <p class="text-[10px] text-blue-100 flex items-center gap-1 font-medium">
-                    <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> Kumpul sedulur Putune Mbah Dul - Bandiyatun 2027
+            <div class="min-w-0 flex-1">
+                <h1 class="text-xs sm:text-base font-bold tracking-wide text-white leading-tight truncate">Ayo ke Malang!</h1>
+                <p class="text-[9px] sm:text-[10px] text-blue-100 flex items-center gap-1 font-medium truncate">
+                    <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse shrink-0"></span> <span class="truncate">Putune Mbah Dul - Bandiyatun 2027</span>
                 </p>
             </div>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <!-- PWA Install Button (Jingga / Oranye Tombol #FF9100) -->
-            <button id="pwa-install-btn" onclick="installPWA()" class="hidden px-2.5 py-1 bg-[#FF9100] hover:bg-[#e68200] text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow transition">
-                <i class="fa-solid fa-download"></i> Install
+            <button id="pwa-install-btn" onclick="installPWA()" class="hidden px-2 sm:px-2.5 py-1 bg-[#FF9100] hover:bg-[#e68200] text-white rounded-lg text-[10px] sm:text-xs font-semibold flex items-center gap-1 shadow transition whitespace-nowrap">
+                <i class="fa-solid fa-download"></i> <span class="hidden xs:inline">Install</span>
             </button>
-            <span class="px-2.5 py-1 bg-white/20 border border-white/30 text-white rounded-lg text-xs font-semibold backdrop-blur-sm">
-                <i class="fa-solid fa-cloud-sun text-yellow-300 mr-1"></i>21°C
+            <span class="px-2 sm:px-2.5 py-1 bg-white/20 border border-white/30 text-white rounded-lg text-[10px] sm:text-xs font-semibold backdrop-blur-sm whitespace-nowrap">
+                <i class="fa-solid fa-cloud-sun text-yellow-300 mr-0.5 sm:mr-1"></i>21°C
             </span>
         </div>
     </header>
 
     <!-- Main Content Viewport -->
-    <main class="flex-1 pt-16 pb-16 overflow-y-auto relative bg-slate-50">
+    <main class="flex-1 pt-14 sm:pt-16 pb-16 overflow-y-auto relative bg-slate-50">
 
         <!-- ================= PAGE 1: MAP PAGE ================= -->
         <section id="page-map" class="page-content active h-full relative">
             <!-- Search & Filter Overlay -->
-            <div class="absolute top-3 left-3 right-3 z-20 space-y-2">
+            <div class="absolute top-2.5 sm:top-3 left-2 sm:left-3 right-2 sm:right-3 z-20 space-y-2">
                 <!-- Search Box -->
                 <div class="relative glass-panel rounded-2xl shadow-lg overflow-hidden border border-slate-200">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-[#00A8CC]"></i>
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[#00A8CC] text-xs sm:text-sm"></i>
                     <input type="text" id="map-search" placeholder="Cari wisata, homestay, atau kuliner..." 
                            oninput="onSearchMap(this.value)"
-                           class="w-full bg-transparent pl-10 pr-10 py-2.5 text-xs text-[#4A4A4A] placeholder-slate-400 focus:outline-none">
+                           class="w-full bg-transparent pl-9 pr-9 py-2 sm:py-2.5 text-[11px] sm:text-xs text-[#4A4A4A] placeholder-slate-400 focus:outline-none">
                     <button onclick="clearMapSearch()" id="clear-search-btn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#FF5252]">
-                        <i class="fa-solid fa-circle-xmark"></i>
+                        <i class="fa-solid fa-circle-xmark text-xs sm:text-sm"></i>
                     </button>
                 </div>
 
                 <!-- Category Pills -->
                 <div class="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-                    <button onclick="filterCategory('all')" id="btn-cat-all" class="cat-pill active px-3 py-1.5 rounded-full text-xs font-semibold bg-[#00BFA5] text-white shadow-md transition">
+                    <button onclick="filterCategory('all')" id="btn-cat-all" class="cat-pill active whitespace-nowrap shrink-0 px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-[#00BFA5] text-white shadow-md transition">
                         <i class="fa-solid fa-layer-group mr-1"></i> Semua
                     </button>
-                    <button onclick="filterCategory('kumpul')" id="btn-cat-kumpul" class="cat-pill px-3 py-1.5 rounded-full text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200 shadow-sm transition">
+                    <button onclick="filterCategory('kumpul')" id="btn-cat-kumpul" class="cat-pill whitespace-nowrap shrink-0 px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200 shadow-sm transition">
                         <i class="fa-solid fa-flag-checkered text-[#FF4081] mr-1"></i> Titik Kumpul (1)
                     </button>
-                    <button onclick="filterCategory('homestay')" id="btn-cat-homestay" class="cat-pill px-3 py-1.5 rounded-full text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200 shadow-sm transition">
+                    <button onclick="filterCategory('homestay')" id="btn-cat-homestay" class="cat-pill whitespace-nowrap shrink-0 px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200 shadow-sm transition">
                         <i class="fa-solid fa-house-user text-[#00A8CC] mr-1"></i> Homestay ≤5KM (5)
                     </button>
-                    <button onclick="filterCategory('wisata')" id="btn-cat-wisata" class="cat-pill px-3 py-1.5 rounded-full text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200 shadow-sm transition">
+                    <button onclick="filterCategory('wisata')" id="btn-cat-wisata" class="cat-pill whitespace-nowrap shrink-0 px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200 shadow-sm transition">
                         <i class="fa-solid fa-mountain-sun text-[#00BFA5] mr-1"></i> Wisata (5)
                     </button>
-                    <button onclick="filterCategory('kuliner')" id="btn-cat-kuliner" class="cat-pill px-3 py-1.5 rounded-full text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200 shadow-sm transition">
+                    <button onclick="filterCategory('kuliner')" id="btn-cat-kuliner" class="cat-pill whitespace-nowrap shrink-0 px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200 shadow-sm transition">
                         <i class="fa-solid fa-utensils text-[#FF9100] mr-1"></i> Kuliner Legend (7)
                     </button>
                 </div>
@@ -153,39 +161,39 @@
             <div id="map"></div>
 
             <!-- Floating Action Buttons on Map -->
-            <div class="absolute bottom-4 right-3 z-20 flex flex-col gap-2">
-                <button onclick="toggleMapType()" title="Ganti Mode Peta" class="w-10 h-10 bg-white rounded-full text-[#4A4A4A] flex items-center justify-center shadow-md border border-slate-200 hover:bg-slate-100 active:scale-95 transition">
-                    <i class="fa-solid fa-map text-[#40C4FF]"></i>
+            <div class="absolute bottom-4 right-2 sm:right-3 z-20 flex flex-col gap-2">
+                <button onclick="toggleMapType()" title="Ganti Mode Peta" class="w-9 h-9 sm:w-10 sm:h-10 bg-white rounded-full text-[#4A4A4A] flex items-center justify-center shadow-md border border-slate-200 hover:bg-slate-100 active:scale-95 transition">
+                    <i class="fa-solid fa-map text-[#40C4FF] text-sm sm:text-base"></i>
                 </button>
-                <button onclick="centerUserLocation()" title="Lokasi Saya" class="w-10 h-10 bg-white rounded-full text-[#00BFA5] flex items-center justify-center shadow-md border border-slate-200 hover:bg-slate-100 active:scale-95 transition">
-                    <i class="fa-solid fa-location-crosshairs text-lg"></i>
+                <button onclick="centerUserLocation()" title="Lokasi Saya" class="w-9 h-9 sm:w-10 sm:h-10 bg-white rounded-full text-[#00BFA5] flex items-center justify-center shadow-md border border-slate-200 hover:bg-slate-100 active:scale-95 transition">
+                    <i class="fa-solid fa-location-crosshairs text-base sm:text-lg"></i>
                 </button>
             </div>
 
             <!-- Selected Location Bottom Card Sheet -->
-            <div id="map-bottom-sheet" class="hidden absolute bottom-3 left-3 right-3 z-30 glass-panel p-4 rounded-2xl shadow-2xl border border-slate-200 transition-all duration-300">
-                <div class="flex items-start justify-between">
-                    <div class="flex gap-3">
-                        <img id="sheet-img" src="" class="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow">
-                        <div>
-                            <span id="sheet-badge" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#FF4081]/10 text-[#FF4081] border border-[#FF4081]/30">Wisata</span>
-                            <h3 id="sheet-title" class="font-bold text-[#4A4A4A] text-sm mt-1">Nama Tempat</h3>
-                            <p id="sheet-desc" class="text-xs text-slate-500 mt-0.5 line-clamp-1">Deskripsi singkat lokasi...</p>
-                            <p id="sheet-sub" class="text-[11px] text-[#FF9100] mt-1 font-bold"><i class="fa-solid fa-star mr-1"></i>4.8 • <span id="sheet-price" class="text-[#FF5252] font-semibold">Gratis</span></p>
+            <div id="map-bottom-sheet" class="hidden absolute bottom-2 sm:bottom-3 left-2 sm:left-3 right-2 sm:right-3 z-30 glass-panel p-3 sm:p-4 rounded-2xl shadow-2xl border border-slate-200 transition-all duration-300">
+                <div class="flex items-start justify-between gap-2">
+                    <div class="flex gap-2.5 sm:gap-3 min-w-0 flex-1">
+                        <img id="sheet-img" src="" class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover border border-slate-200 shadow shrink-0">
+                        <div class="min-w-0 flex-1">
+                            <span id="sheet-badge" class="px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-[#FF4081]/10 text-[#FF4081] border border-[#FF4081]/30">Wisata</span>
+                            <h3 id="sheet-title" class="font-bold text-[#4A4A4A] text-xs sm:text-sm mt-0.5 truncate">Nama Tempat</h3>
+                            <p id="sheet-desc" class="text-[11px] sm:text-xs text-slate-500 mt-0.5 truncate">Deskripsi singkat lokasi...</p>
+                            <p id="sheet-sub" class="text-[10px] sm:text-[11px] text-[#FF9100] mt-0.5 font-bold truncate"><i class="fa-solid fa-star mr-1"></i>4.8 • <span id="sheet-price" class="text-[#FF5252] font-semibold">Gratis</span></p>
                         </div>
                     </div>
-                    <button onclick="closeBottomSheet()" class="text-slate-400 hover:text-[#FF5252] p-1">
-                        <i class="fa-solid fa-xmark text-lg"></i>
+                    <button onclick="closeBottomSheet()" class="text-slate-400 hover:text-[#FF5252] p-1 shrink-0">
+                        <i class="fa-solid fa-xmark text-base sm:text-lg"></i>
                     </button>
                 </div>
-                <div class="mt-3 pt-3 border-t border-slate-200 flex gap-2">
+                <div class="mt-2.5 sm:mt-3 pt-2.5 sm:pt-3 border-t border-slate-200 flex gap-2">
                     <!-- Tombol Bantuan #00A8CC -->
-                    <button id="sheet-detail-btn" class="flex-1 py-2 bg-[#00A8CC] hover:bg-[#0092b3] text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 shadow-md">
+                    <button id="sheet-detail-btn" class="flex-1 py-1.5 sm:py-2 bg-[#00A8CC] hover:bg-[#0092b3] text-white text-[11px] sm:text-xs font-semibold rounded-xl flex items-center justify-center gap-1 shadow-md">
                         <i class="fa-solid fa-circle-info"></i> Info Detail
                     </button>
                     <!-- Tombol Oranye #FF9100 -->
-                    <a id="sheet-route-btn" target="_blank" class="flex-1 py-2 bg-[#FF9100] hover:bg-[#e68200] text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 shadow-md">
-                        <i class="fa-solid fa-diamond-turn-right"></i> Rute Petunjuk
+                    <a id="sheet-route-btn" target="_blank" class="flex-1 py-1.5 sm:py-2 bg-[#FF9100] hover:bg-[#e68200] text-white text-[11px] sm:text-xs font-semibold rounded-xl flex items-center justify-center gap-1 shadow-md">
+                        <i class="fa-solid fa-diamond-turn-right"></i> Petunjuk Arah
                     </a>
                 </div>
             </div>
@@ -193,128 +201,128 @@
 
 
         <!-- ================= PAGE 2: DIRECTORY PAGE ================= -->
-        <section id="page-directory" class="page-content min-h-full p-4 space-y-4">
+        <section id="page-directory" class="page-content min-h-full p-3 sm:p-4 space-y-3.5 sm:space-y-4">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-lg font-bold text-[#4A4A4A]">Direktori Lokasi</h2>
-                    <p class="text-xs text-slate-500">Eksplorasi 18 destinasi & titik kumpul di Batu</p>
+                    <h2 class="text-base sm:text-lg font-bold text-[#4A4A4A]">Direktori Lokasi</h2>
+                    <p class="text-[11px] sm:text-xs text-slate-500">Eksplorasi 18 destinasi & titik kumpul</p>
                 </div>
-                <div class="text-xs bg-[#00BFA5]/10 px-3 py-1.5 rounded-xl border border-[#00BFA5]/30 text-[#00BFA5] font-bold">
-                    Total: <span id="dir-count">18</span> Titik
+                <div class="text-[11px] sm:text-xs bg-[#00BFA5]/10 px-2.5 py-1 rounded-xl border border-[#00BFA5]/30 text-[#00BFA5] font-bold whitespace-nowrap">
+                    Total: <span id="dir-count">18</span>
                 </div>
             </div>
 
             <!-- Directory Filter Bar -->
-            <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-                <button onclick="filterDir('all')" class="dir-tab active px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#00BFA5] text-white">Semua</button>
-                <button onclick="filterDir('kumpul')" class="dir-tab px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200">Titik Kumpul</button>
-                <button onclick="filterDir('homestay')" class="dir-tab px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200">Homestay (≤5 KM)</button>
-                <button onclick="filterDir('wisata')" class="dir-tab px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200">Wisata</button>
-                <button onclick="filterDir('kuliner')" class="dir-tab px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200">Kuliner Legend</button>
+            <div class="flex gap-1.5 sm:gap-2 overflow-x-auto pb-1 no-scrollbar">
+                <button onclick="filterDir('all')" class="dir-tab active whitespace-nowrap shrink-0 px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold bg-[#00BFA5] text-white">Semua</button>
+                <button onclick="filterDir('kumpul')" class="dir-tab whitespace-nowrap shrink-0 px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200">Titik Kumpul</button>
+                <button onclick="filterDir('homestay')" class="dir-tab whitespace-nowrap shrink-0 px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200">Homestay (≤5 KM)</button>
+                <button onclick="filterDir('wisata')" class="dir-tab whitespace-nowrap shrink-0 px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200">Wisata</button>
+                <button onclick="filterDir('kuliner')" class="dir-tab whitespace-nowrap shrink-0 px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200">Kuliner Legend</button>
             </div>
 
             <!-- Directory List Cards -->
-            <div id="directory-list" class="space-y-3 pb-8">
+            <div id="directory-list" class="space-y-2.5 sm:space-y-3 pb-8">
                 <!-- Dynamic injected cards -->
             </div>
         </section>
 
 
         <!-- ================= PAGE 3: RUNDOWN ACARA PAGE ================= -->
-        <section id="page-rundown" class="page-content min-h-full p-4 space-y-5">
+        <section id="page-rundown" class="page-content min-h-full p-3 sm:p-4 space-y-4">
             <div>
-                <h2 class="text-lg font-bold text-[#4A4A4A]">Rundown & Itinerary</h2>
-                <p class="text-xs text-slate-500">Rencanakan agenda kumpul keluarga Mbah Dul di Kota Batu</p>
+                <h2 class="text-base sm:text-lg font-bold text-[#4A4A4A]">Rundown & Itinerary</h2>
+                <p class="text-[11px] sm:text-xs text-slate-500">Rencanakan agenda kumpul keluarga di Kota Batu</p>
             </div>
 
             <!-- Tab Switcher -->
             <div class="flex bg-slate-100 p-1 rounded-2xl border border-slate-200">
-                <button onclick="switchRundownTab('preset')" id="tab-btn-preset" class="flex-1 py-2 text-xs font-semibold rounded-xl bg-[#00BFA5] text-white shadow">
+                <button onclick="switchRundownTab('preset')" id="tab-btn-preset" class="flex-1 py-1.5 sm:py-2 text-[11px] sm:text-xs font-semibold rounded-xl bg-[#00BFA5] text-white shadow">
                     <i class="fa-solid fa-compass mr-1"></i> Paket Rekomendasi
                 </button>
-                <button onclick="switchRundownTab('custom')" id="tab-btn-custom" class="flex-1 py-2 text-xs font-semibold rounded-xl text-slate-500 hover:text-[#4A4A4A]">
+                <button onclick="switchRundownTab('custom')" id="tab-btn-custom" class="flex-1 py-1.5 sm:py-2 text-[11px] sm:text-xs font-semibold rounded-xl text-slate-500 hover:text-[#4A4A4A]">
                     <i class="fa-solid fa-pen-to-square mr-1"></i> Buat Agenda
                 </button>
             </div>
 
             <!-- TAB 1: PRESET ITINERARY (3D2N) -->
-            <div id="rundown-preset-view" class="space-y-4">
-                <div class="p-3 bg-[#40C4FF]/10 border border-[#40C4FF]/30 rounded-2xl flex items-center gap-3">
-                    <i class="fa-solid fa-circle-info text-[#00A8CC] text-xl"></i>
-                    <p class="text-xs text-[#4A4A4A]">Rencana perjalanan optimal 3 Hari 2 Malam hemat waktu & efisien rute.</p>
+            <div id="rundown-preset-view" class="space-y-3.5 sm:space-y-4">
+                <div class="p-2.5 sm:p-3 bg-[#40C4FF]/10 border border-[#40C4FF]/30 rounded-2xl flex items-center gap-2.5 sm:gap-3">
+                    <i class="fa-solid fa-circle-info text-[#00A8CC] text-lg sm:text-xl shrink-0"></i>
+                    <p class="text-[11px] sm:text-xs text-[#4A4A4A]">Rencana perjalanan 3 Hari 2 Malam hemat waktu & efisien rute.</p>
                 </div>
 
                 <!-- Day 1 -->
-                <div class="bg-white rounded-2xl p-4 space-y-3 border border-slate-200 shadow-sm">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-                        <span class="text-xs font-bold text-[#00BFA5] uppercase tracking-wider"><i class="fa-solid fa-calendar-day mr-1"></i> Hari 1 - Kumpul Rombongan & Wisata</span>
-                        <span class="text-[10px] bg-[#FF4081]/10 text-[#FF4081] px-2 py-0.5 rounded-full font-bold">Titik Nol KM</span>
+                <div class="bg-white rounded-2xl p-3 sm:p-4 space-y-3 border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2 gap-1">
+                        <span class="text-[11px] sm:text-xs font-bold text-[#00BFA5] uppercase tracking-wider truncate"><i class="fa-solid fa-calendar-day mr-1"></i> Hari 1 - Wisata</span>
+                        <span class="text-[9px] sm:text-[10px] bg-[#FF4081]/10 text-[#FF4081] px-2 py-0.5 rounded-full font-bold whitespace-nowrap">Titik Nol KM</span>
                     </div>
-                    <ul class="space-y-3 text-xs">
-                        <li class="flex items-start gap-3">
-                            <span class="font-bold text-slate-500 w-12 shrink-0">08:00</span>
-                            <div class="bg-slate-50 p-2.5 rounded-xl border border-[#FF4081]/30 w-full">
-                                <p class="font-bold text-[#FF4081]"><i class="fa-solid fa-flag-checkered mr-1"></i> Titik Nol KM - Masjid Jami' An-Nuur</p>
-                                <p class="text-[11px] text-slate-500">Kumpul awal seluruh keluarga Mbah Dul, koordinasi & doa bersama.</p>
+                    <ul class="space-y-2.5 text-xs">
+                        <li class="flex items-start gap-2 sm:gap-3">
+                            <span class="font-bold text-slate-500 w-10 sm:w-12 shrink-0 text-[11px] sm:text-xs">08:00</span>
+                            <div class="bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-[#FF4081]/30 w-full min-w-0">
+                                <p class="font-bold text-[#FF4081] text-[11px] sm:text-xs truncate"><i class="fa-solid fa-flag-checkered mr-1"></i> Titik Nol KM - Masjid Jami' Batu</p>
+                                <p class="text-[10px] sm:text-[11px] text-slate-500">Kumpul awal seluruh keluarga Mbah Dul & doa bersama.</p>
                             </div>
                         </li>
-                        <li class="flex items-start gap-3">
-                            <span class="font-bold text-slate-500 w-12 shrink-0">09:30</span>
-                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 w-full">
-                                <p class="font-bold text-[#4A4A4A]">Taman Rekreasi Selecta</p>
-                                <p class="text-[11px] text-slate-500">Menikmati udara sejuk & kebun bunga panorama.</p>
+                        <li class="flex items-start gap-2 sm:gap-3">
+                            <span class="font-bold text-slate-500 w-10 sm:w-12 shrink-0 text-[11px] sm:text-xs">09:30</span>
+                            <div class="bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200 w-full min-w-0">
+                                <p class="font-bold text-[#4A4A4A] text-[11px] sm:text-xs truncate">Taman Rekreasi Selecta</p>
+                                <p class="text-[10px] sm:text-[11px] text-slate-500">Menikmati udara sejuk & kebun bunga panorama.</p>
                             </div>
                         </li>
-                        <li class="flex items-start gap-3">
-                            <span class="font-bold text-slate-500 w-12 shrink-0">12:30</span>
-                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 w-full">
-                                <p class="font-bold text-[#FF9100]">Sate Kelinci Batu Organik</p>
-                                <p class="text-[11px] text-slate-500">Makan siang kuliner khas di kawasan Selecta.</p>
+                        <li class="flex items-start gap-2 sm:gap-3">
+                            <span class="font-bold text-slate-500 w-10 sm:w-12 shrink-0 text-[11px] sm:text-xs">12:30</span>
+                            <div class="bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200 w-full min-w-0">
+                                <p class="font-bold text-[#FF9100] text-[11px] sm:text-xs truncate">Sate Kelinci Batu Organik</p>
+                                <p class="text-[10px] sm:text-[11px] text-slate-500">Makan siang kuliner khas kawasan Selecta.</p>
                             </div>
                         </li>
-                        <li class="flex items-start gap-3">
-                            <span class="font-bold text-slate-500 w-12 shrink-0">15:00</span>
-                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 w-full">
-                                <p class="font-bold text-[#00A8CC]">Check-in Homestay (Radius <5 KM)</p>
-                                <p class="text-[11px] text-slate-500">Istirahat sejenak di Homestay Bunga / Omah Heritage Batu.</p>
+                        <li class="flex items-start gap-2 sm:gap-3">
+                            <span class="font-bold text-slate-500 w-10 sm:w-12 shrink-0 text-[11px] sm:text-xs">15:00</span>
+                            <div class="bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200 w-full min-w-0">
+                                <p class="font-bold text-[#00A8CC] text-[11px] sm:text-xs truncate">Check-in Homestay (≤5 KM)</p>
+                                <p class="text-[10px] sm:text-[11px] text-slate-500">Istirahat sejenak di Homestay Bunga / Omah Heritage.</p>
                             </div>
                         </li>
-                        <li class="flex items-start gap-3">
-                            <span class="font-bold text-slate-500 w-12 shrink-0">19:00</span>
-                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 w-full">
-                                <p class="font-bold text-[#FF9100]">Pos Ketan Legenda 1967 & Alun-Alun</p>
-                                <p class="text-[11px] text-slate-500">Malam hari jalan-jalan & kulineran legendaris.</p>
+                        <li class="flex items-start gap-2 sm:gap-3">
+                            <span class="font-bold text-slate-500 w-10 sm:w-12 shrink-0 text-[11px] sm:text-xs">19:00</span>
+                            <div class="bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200 w-full min-w-0">
+                                <p class="font-bold text-[#FF9100] text-[11px] sm:text-xs truncate">Pos Ketan Legenda 1967</p>
+                                <p class="text-[10px] sm:text-[11px] text-slate-500">Malam hari jalan-jalan & kulineran legendaris.</p>
                             </div>
                         </li>
                     </ul>
                 </div>
 
                 <!-- Day 2 -->
-                <div class="bg-white rounded-2xl p-4 space-y-3 border border-slate-200 shadow-sm">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-                        <span class="text-xs font-bold text-[#00BFA5] uppercase tracking-wider"><i class="fa-solid fa-calendar-day mr-1"></i> Hari 2 - Edukasi & Otomotif</span>
-                        <span class="text-[10px] bg-[#FF4081]/10 text-[#FF4081] px-2 py-0.5 rounded-full font-bold">Favorit Keluarga</span>
+                <div class="bg-white rounded-2xl p-3 sm:p-4 space-y-3 border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2 gap-1">
+                        <span class="text-[11px] sm:text-xs font-bold text-[#00BFA5] uppercase tracking-wider truncate"><i class="fa-solid fa-calendar-day mr-1"></i> Hari 2 - Edukasi & Otomotif</span>
+                        <span class="text-[9px] sm:text-[10px] bg-[#FF4081]/10 text-[#FF4081] px-2 py-0.5 rounded-full font-bold whitespace-nowrap">Favorit</span>
                     </div>
-                    <ul class="space-y-3 text-xs">
-                        <li class="flex items-start gap-3">
-                            <span class="font-bold text-slate-500 w-12 shrink-0">08:30</span>
-                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 w-full">
-                                <p class="font-bold text-[#4A4A4A]">Jatim Park 2 (Batu Secret Zoo)</p>
-                                <p class="text-[11px] text-slate-500">Eksplorasi satwa modern & museum satwa.</p>
+                    <ul class="space-y-2.5 text-xs">
+                        <li class="flex items-start gap-2 sm:gap-3">
+                            <span class="font-bold text-slate-500 w-10 sm:w-12 shrink-0 text-[11px] sm:text-xs">08:30</span>
+                            <div class="bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200 w-full min-w-0">
+                                <p class="font-bold text-[#4A4A4A] text-[11px] sm:text-xs truncate">Jatim Park 2 (Secret Zoo)</p>
+                                <p class="text-[10px] sm:text-[11px] text-slate-500">Eksplorasi satwa modern & museum satwa.</p>
                             </div>
                         </li>
-                        <li class="flex items-start gap-3">
-                            <span class="font-bold text-slate-500 w-12 shrink-0">13:00</span>
-                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 w-full">
-                                <p class="font-bold text-[#FF9100]">Bakso De'Koes / Pemuda Batu</p>
-                                <p class="text-[11px] text-slate-500">Santap Bakso Malang kuah kaldu segar.</p>
+                        <li class="flex items-start gap-2 sm:gap-3">
+                            <span class="font-bold text-slate-500 w-10 sm:w-12 shrink-0 text-[11px] sm:text-xs">13:00</span>
+                            <div class="bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200 w-full min-w-0">
+                                <p class="font-bold text-[#FF9100] text-[11px] sm:text-xs truncate">Bakso De'Koes / Pemuda</p>
+                                <p class="text-[10px] sm:text-[11px] text-slate-500">Santap Bakso Malang kuah kaldu segar.</p>
                             </div>
                         </li>
-                        <li class="flex items-start gap-3">
-                            <span class="font-bold text-slate-500 w-12 shrink-0">15:30</span>
-                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 w-full">
-                                <p class="font-bold text-[#4A4A4A]">Museum Angkut</p>
-                                <p class="text-[11px] text-slate-500">Foto-foto spot tematik zona Eropa & Gangster Amerika.</p>
+                        <li class="flex items-start gap-2 sm:gap-3">
+                            <span class="font-bold text-slate-500 w-10 sm:w-12 shrink-0 text-[11px] sm:text-xs">15:30</span>
+                            <div class="bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200 w-full min-w-0">
+                                <p class="font-bold text-[#4A4A4A] text-[11px] sm:text-xs truncate">Museum Angkut</p>
+                                <p class="text-[10px] sm:text-[11px] text-slate-500">Foto spot tematik zona Eropa & Gangster Amerika.</p>
                             </div>
                         </li>
                     </ul>
@@ -322,15 +330,15 @@
             </div>
 
             <!-- TAB 2: CUSTOM AGENDA BUILDER -->
-            <div id="rundown-custom-view" class="hidden space-y-4">
-                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-                    <h3 class="text-xs font-bold text-[#4A4A4A] uppercase tracking-wider">Tambah Item Agenda</h3>
-                    <div class="grid grid-cols-1 gap-2.5">
+            <div id="rundown-custom-view" class="hidden space-y-3.5 sm:space-y-4">
+                <div class="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2.5 sm:space-y-3">
+                    <h3 class="text-[11px] sm:text-xs font-bold text-[#4A4A4A] uppercase tracking-wider">Tambah Item Agenda</h3>
+                    <div class="grid grid-cols-1 gap-2">
                         <input type="time" id="cust-time" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-[#4A4A4A] focus:outline-none focus:border-[#00BFA5]">
                         <select id="cust-location" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-[#4A4A4A] focus:outline-none focus:border-[#00BFA5]">
                             <!-- Injected dynamically -->
                         </select>
-                        <input type="text" id="cust-note" placeholder="Catatan Tambahan (misal: Beli tiket online)" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-[#4A4A4A] focus:outline-none focus:border-[#00BFA5]">
+                        <input type="text" id="cust-note" placeholder="Catatan Tambahan (misal: Tiket online)" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-[#4A4A4A] focus:outline-none focus:border-[#00BFA5]">
                         <button onclick="addCustomRundown()" class="w-full py-2 bg-[#FF9100] hover:bg-[#e68200] text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow">
                             <i class="fa-solid fa-plus"></i> Tambahkan ke Jadwal
                         </button>
@@ -354,39 +362,39 @@
 
     <!-- Detail Modal Dialog -->
     <div id="detail-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all">
-        <div class="bg-white w-full max-w-md max-h-[90vh] rounded-t-3xl sm:rounded-3xl overflow-y-auto p-5 border border-slate-200 space-y-4 shadow-2xl">
+        <div class="bg-white w-full max-w-md max-h-[90vh] rounded-t-3xl sm:rounded-3xl overflow-y-auto p-4 sm:p-5 border border-slate-200 space-y-3 sm:space-y-4 shadow-2xl">
             <div class="flex justify-between items-start">
-                <span id="modal-category" class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#FF4081]/10 text-[#FF4081] border border-[#FF4081]/30">Kategori</span>
-                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-[#FF5252] flex items-center justify-center">
-                    <i class="fa-solid fa-xmark"></i>
+                <span id="modal-category" class="px-2.5 py-1 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-[#FF4081]/10 text-[#FF4081] border border-[#FF4081]/30">Kategori</span>
+                <button onclick="closeModal()" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-500 hover:text-[#FF5252] flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-sm sm:text-base"></i>
                 </button>
             </div>
             
-            <img id="modal-img" src="" class="w-full h-48 rounded-2xl object-cover border border-slate-200 shadow-sm">
+            <img id="modal-img" src="" class="w-full h-36 sm:h-48 rounded-2xl object-cover border border-slate-200 shadow-sm">
             
             <div>
-                <h2 id="modal-title" class="text-lg font-bold text-[#4A4A4A]">Nama Tempat</h2>
-                <p id="modal-sub" class="text-xs text-[#FF9100] font-bold mt-1"><i class="fa-solid fa-star mr-1"></i><span id="modal-rating">4.8</span> • <span id="modal-price" class="text-[#FF5252]">Rp 50.000</span></p>
+                <h2 id="modal-title" class="text-base sm:text-lg font-bold text-[#4A4A4A] leading-snug">Nama Tempat</h2>
+                <p id="modal-sub" class="text-[11px] sm:text-xs text-[#FF9100] font-bold mt-0.5"><i class="fa-solid fa-star mr-1"></i><span id="modal-rating">4.8</span> • <span id="modal-price" class="text-[#FF5252]">Rp 50.000</span></p>
             </div>
 
-            <p id="modal-desc" class="text-xs text-slate-600 leading-relaxed">Deskripsi lengkap mengenai lokasi...</p>
+            <p id="modal-desc" class="text-[11px] sm:text-xs text-slate-600 leading-relaxed">Deskripsi lengkap mengenai lokasi...</p>
 
-            <div class="space-y-2 text-xs bg-slate-50 p-3 rounded-2xl border border-slate-200">
+            <div class="space-y-1.5 sm:space-y-2 text-[11px] sm:text-xs bg-slate-50 p-2.5 sm:p-3 rounded-2xl border border-slate-200">
                 <div class="flex items-start gap-2 text-slate-600">
-                    <i class="fa-solid fa-location-dot text-[#00BFA5] mt-0.5"></i>
+                    <i class="fa-solid fa-location-dot text-[#00BFA5] mt-0.5 shrink-0"></i>
                     <span id="modal-address">Jl. Raya Batu No. 123, Kota Batu</span>
                 </div>
                 <div class="flex items-center gap-2 text-slate-600">
-                    <i class="fa-solid fa-clock text-[#00BFA5]"></i>
+                    <i class="fa-solid fa-clock text-[#00BFA5] shrink-0"></i>
                     <span id="modal-hours">08:00 - 17:00 WIB</span>
                 </div>
             </div>
 
-            <div class="flex gap-2 pt-2">
-                <button id="modal-show-map-btn" class="flex-1 py-2.5 bg-[#00A8CC] hover:bg-[#0092b3] text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow">
-                    <i class="fa-solid fa-map-pin"></i> Lihat di Peta
+            <div class="flex gap-2 pt-1 sm:pt-2">
+                <button id="modal-show-map-btn" class="flex-1 py-2 sm:py-2.5 bg-[#00A8CC] hover:bg-[#0092b3] text-white font-semibold rounded-xl text-[11px] sm:text-xs flex items-center justify-center gap-1 shadow">
+                    <i class="fa-solid fa-map-pin"></i> Lihat Peta
                 </button>
-                <a id="modal-route-btn" target="_blank" class="flex-1 py-2.5 bg-[#FF9100] hover:bg-[#e68200] text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow">
+                <a id="modal-route-btn" target="_blank" class="flex-1 py-2 sm:py-2.5 bg-[#FF9100] hover:bg-[#e68200] text-white font-semibold rounded-xl text-[11px] sm:text-xs flex items-center justify-center gap-1 shadow">
                     <i class="fa-solid fa-diamond-turn-right"></i> Petunjuk Arah
                 </a>
             </div>
@@ -395,25 +403,25 @@
 
 
     <!-- Bottom Navigation Bar (Android Navigation Bar - Biru Google #1A73E8) -->
-    <nav class="bg-[#1A73E8] fixed bottom-0 left-0 right-0 z-50 border-t border-blue-400/20 px-6 py-2 shadow-lg">
-        <div class="max-w-md mx-auto flex items-center justify-between">
+    <nav class="bg-[#1A73E8] fixed bottom-0 left-0 right-0 z-50 border-t border-blue-400/20 px-2 sm:px-6 py-1.5 sm:py-2 shadow-lg">
+        <div class="max-w-md mx-auto flex items-center justify-around sm:justify-between">
             <button onclick="switchTab('map')" id="nav-map" class="nav-btn active flex flex-col items-center gap-0.5 text-white transition">
-                <div class="nav-pill px-3 py-1 rounded-full bg-white/20 text-white">
-                    <i class="fa-solid fa-map-location-dot text-base"></i>
+                <div class="nav-pill px-2.5 sm:px-3 py-1 rounded-full bg-white/20 text-white">
+                    <i class="fa-solid fa-map-location-dot text-sm sm:text-base"></i>
                 </div>
-                <span class="text-[10px] font-bold tracking-wide">Peta</span>
+                <span class="text-[9px] sm:text-[10px] font-bold tracking-wide">Peta</span>
             </button>
             <button onclick="switchTab('directory')" id="nav-directory" class="nav-btn flex flex-col items-center gap-0.5 text-blue-200 hover:text-white transition">
-                <div class="nav-pill px-3 py-1 rounded-full text-blue-200">
-                    <i class="fa-solid fa-list-ul text-base"></i>
+                <div class="nav-pill px-2.5 sm:px-3 py-1 rounded-full text-blue-200">
+                    <i class="fa-solid fa-list-ul text-sm sm:text-base"></i>
                 </div>
-                <span class="text-[10px] font-bold tracking-wide">Direktori</span>
+                <span class="text-[9px] sm:text-[10px] font-bold tracking-wide">Direktori</span>
             </button>
             <button onclick="switchTab('rundown')" id="nav-rundown" class="nav-btn flex flex-col items-center gap-0.5 text-blue-200 hover:text-white transition">
-                <div class="nav-pill px-3 py-1 rounded-full text-blue-200">
-                    <i class="fa-solid fa-calendar-check text-base"></i>
+                <div class="nav-pill px-2.5 sm:px-3 py-1 rounded-full text-blue-200">
+                    <i class="fa-solid fa-calendar-check text-sm sm:text-base"></i>
                 </div>
-                <span class="text-[10px] font-bold tracking-wide">Rundown</span>
+                <span class="text-[9px] sm:text-[10px] font-bold tracking-wide">Rundown</span>
             </button>
         </div>
     </nav>
@@ -866,24 +874,24 @@
                 if (loc.category === 'kuliner') catBadgeColor = 'bg-[#FF9100]/10 text-[#FF9100] border-[#FF9100]/30';
 
                 const card = document.createElement('div');
-                card.className = 'bg-white p-3.5 rounded-2xl flex gap-3.5 border border-slate-200 hover:border-[#00BFA5] shadow-sm transition cursor-pointer';
+                card.className = 'bg-white p-2.5 sm:p-3.5 rounded-2xl flex gap-2.5 sm:gap-3.5 border border-slate-200 hover:border-[#00BFA5] shadow-sm transition cursor-pointer min-w-0';
                 card.onclick = () => openModal(loc.id);
 
                 card.innerHTML = `
-                    <img src="${loc.image}" class="w-24 h-24 rounded-xl object-cover border border-slate-200 shrink-0">
-                    <div class="flex flex-col justify-between flex-1">
+                    <img src="${loc.image}" class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover border border-slate-200 shrink-0">
+                    <div class="flex flex-col justify-between flex-1 min-w-0">
                         <div>
-                            <div class="flex items-center justify-between">
-                                <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${catBadgeColor} border">${loc.category}</span>
-                                <span class="text-xs font-bold text-[#FF9100]"><i class="fa-solid fa-star mr-1"></i>${loc.rating}</span>
+                            <div class="flex items-center justify-between gap-1">
+                                <span class="px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] font-bold uppercase tracking-wider ${catBadgeColor} border truncate">${loc.category}</span>
+                                <span class="text-[11px] sm:text-xs font-bold text-[#FF9100] whitespace-nowrap"><i class="fa-solid fa-star mr-1"></i>${loc.rating}</span>
                             </div>
-                            <h3 class="font-bold text-[#4A4A4A] text-sm mt-1 leading-snug">${loc.name}</h3>
-                            <p class="text-[11px] text-slate-500 mt-1 line-clamp-1">${loc.desc}</p>
+                            <h3 class="font-bold text-[#4A4A4A] text-xs sm:text-sm mt-0.5 leading-snug truncate">${loc.name}</h3>
+                            <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5 truncate">${loc.desc}</p>
                         </div>
-                        <div class="flex items-center justify-between mt-2 pt-1 border-t border-slate-100">
-                            <span class="text-[11px] text-[#FF5252] font-semibold">${loc.price}</span>
-                            <span class="text-xs text-[#00BFA5] font-bold flex items-center gap-1">
-                                Info Detail <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        <div class="flex items-center justify-between mt-1.5 pt-1 border-t border-slate-100 gap-1">
+                            <span class="text-[10px] sm:text-[11px] text-[#FF5252] font-semibold truncate">${loc.price}</span>
+                            <span class="text-[10px] sm:text-xs text-[#00BFA5] font-bold flex items-center gap-0.5 shrink-0">
+                                Detail <i class="fa-solid fa-chevron-right text-[9px]"></i>
                             </span>
                         </div>
                     </div>
