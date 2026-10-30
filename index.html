@@ -360,41 +360,45 @@
 
     </main>
 
-    <!-- Detail Modal Dialog -->
-    <div id="detail-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all">
-        <div class="bg-white w-full max-w-md max-h-[90vh] rounded-t-3xl sm:rounded-3xl overflow-y-auto p-4 sm:p-5 border border-slate-200 space-y-3 sm:space-y-4 shadow-2xl">
-            <div class="flex justify-between items-start">
-                <span id="modal-category" class="px-2.5 py-1 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-[#FF4081]/10 text-[#FF4081] border border-[#FF4081]/30">Kategori</span>
-                <button onclick="closeModal()" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-500 hover:text-[#FF5252] flex items-center justify-center">
-                    <i class="fa-solid fa-xmark text-sm sm:text-base"></i>
-                </button>
-            </div>
-            
-            <img id="modal-img" src="" class="w-full h-36 sm:h-48 rounded-2xl object-cover border border-slate-200 shadow-sm">
-            
-            <div>
-                <h2 id="modal-title" class="text-base sm:text-lg font-bold text-[#4A4A4A] leading-snug">Nama Tempat</h2>
-                <p id="modal-sub" class="text-[11px] sm:text-xs text-[#FF9100] font-bold mt-0.5"><i class="fa-solid fa-star mr-1"></i><span id="modal-rating">4.8</span> • <span id="modal-price" class="text-[#FF5252]">Rp 50.000</span></p>
-            </div>
-
-            <p id="modal-desc" class="text-[11px] sm:text-xs text-slate-600 leading-relaxed">Deskripsi lengkap mengenai lokasi...</p>
-
-            <div class="space-y-1.5 sm:space-y-2 text-[11px] sm:text-xs bg-slate-50 p-2.5 sm:p-3 rounded-2xl border border-slate-200">
-                <div class="flex items-start gap-2 text-slate-600">
-                    <i class="fa-solid fa-location-dot text-[#00BFA5] mt-0.5 shrink-0"></i>
-                    <span id="modal-address">Jl. Raya Batu No. 123, Kota Batu</span>
+    <!-- Detail Modal Dialog (Z-Index diperbaiki z-[60] & Fixed Footer Button) -->
+    <div id="detail-modal" class="hidden fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all">
+        <div class="bg-white w-full max-w-md max-h-[85vh] sm:max-h-[90vh] rounded-t-3xl sm:rounded-3xl flex flex-col overflow-hidden border border-slate-200 shadow-2xl">
+            <!-- Scrollable Body Content -->
+            <div class="overflow-y-auto p-4 sm:p-5 space-y-3 sm:space-y-4 flex-1">
+                <div class="flex justify-between items-start">
+                    <span id="modal-category" class="px-2.5 py-1 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-[#FF4081]/10 text-[#FF4081] border border-[#FF4081]/30">Kategori</span>
+                    <button onclick="closeModal()" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-500 hover:text-[#FF5252] flex items-center justify-center">
+                        <i class="fa-solid fa-xmark text-sm sm:text-base"></i>
+                    </button>
                 </div>
-                <div class="flex items-center gap-2 text-slate-600">
-                    <i class="fa-solid fa-clock text-[#00BFA5] shrink-0"></i>
-                    <span id="modal-hours">08:00 - 17:00 WIB</span>
+                
+                <img id="modal-img" src="" class="w-full h-28 sm:h-40 rounded-2xl object-cover border border-slate-200 shadow-sm">
+                
+                <div>
+                    <h2 id="modal-title" class="text-base sm:text-lg font-bold text-[#4A4A4A] leading-snug">Nama Tempat</h2>
+                    <p id="modal-sub" class="text-[11px] sm:text-xs text-[#FF9100] font-bold mt-0.5"><i class="fa-solid fa-star mr-1"></i><span id="modal-rating">4.8</span> • <span id="modal-price" class="text-[#FF5252]">Rp 50.000</span></p>
+                </div>
+
+                <p id="modal-desc" class="text-[11px] sm:text-xs text-slate-600 leading-relaxed">Deskripsi lengkap mengenai lokasi...</p>
+
+                <div class="space-y-1.5 sm:space-y-2 text-[11px] sm:text-xs bg-slate-50 p-2.5 sm:p-3 rounded-2xl border border-slate-200">
+                    <div class="flex items-start gap-2 text-slate-600">
+                        <i class="fa-solid fa-location-dot text-[#00BFA5] mt-0.5 shrink-0"></i>
+                        <span id="modal-address">Jl. Raya Batu No. 123, Kota Batu</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-slate-600">
+                        <i class="fa-solid fa-clock text-[#00BFA5] shrink-0"></i>
+                        <span id="modal-hours">08:00 - 17:00 WIB</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="flex gap-2 pt-1 sm:pt-2">
-                <button id="modal-show-map-btn" class="flex-1 py-2 sm:py-2.5 bg-[#00A8CC] hover:bg-[#0092b3] text-white font-semibold rounded-xl text-[11px] sm:text-xs flex items-center justify-center gap-1 shadow">
+            <!-- Sticky Action Footer (Selalu Terlihat di Layar HP) -->
+            <div class="p-3 sm:p-4 bg-white border-t border-slate-100 flex gap-2 shrink-0 pb-5 sm:pb-4 shadow-inner">
+                <button id="modal-show-map-btn" class="flex-1 py-2 sm:py-2.5 bg-[#00A8CC] hover:bg-[#0092b3] active:scale-95 text-white font-semibold rounded-xl text-[11px] sm:text-xs flex items-center justify-center gap-1 shadow">
                     <i class="fa-solid fa-map-pin"></i> Lihat Peta
                 </button>
-                <a id="modal-route-btn" target="_blank" class="flex-1 py-2 sm:py-2.5 bg-[#FF9100] hover:bg-[#e68200] text-white font-semibold rounded-xl text-[11px] sm:text-xs flex items-center justify-center gap-1 shadow">
+                <a id="modal-route-btn" target="_blank" class="flex-1 py-2 sm:py-2.5 bg-[#FF9100] hover:bg-[#e68200] active:scale-95 text-white font-semibold rounded-xl text-[11px] sm:text-xs flex items-center justify-center gap-1 shadow">
                     <i class="fa-solid fa-diamond-turn-right"></i> Petunjuk Arah
                 </a>
             </div>
