@@ -3,49 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Keluarga Mbah Dul-Bandiyatun ke Kota Batu Malang 2027</title>
+    <title>WebGIS Kota Batu - PWA</title>
 
+    <!-- PWA & Theme Meta -->
+    <meta name="theme-color" content="#1A73E8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/854/854878.png">
+    
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
-    <!-- Google Fonts Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <style>
-        * {
+        body {
             font-family: 'Inter', sans-serif;
+            background-color: #FFFFFF;
+            color: #4A4A4A;
             -webkit-tap-highlight-color: transparent;
         }
-        
-        body {
-            color: #4A4A4A;
-            background-color: #FFFFFF;
-        }
-        
-        /* Map container setup */
-        #map {
-            width: 100%;
-            height: calc(100vh - 120px);
-            z-index: 1;
-        }
-
-        /* Custom scrollbar & scrollbar hider */
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #00A8CC;
-            border-radius: 4px;
-        }
-
+        /* Custom scrollbar hiding for smooth horizontal swipes */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -53,855 +41,727 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-
-        /* Leaflet custom marker pulse animation */
-        .custom-pin {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            color: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-            transition: transform 0.2s ease;
+        #map {
+            width: 100%;
+            height: 100%;
+            z-index: 10;
         }
-        .custom-pin:hover {
-            transform: scale(1.15);
+        /* Pulsing animation for Titik Nol KM marker */
+        .pulse-marker {
+            box-shadow: 0 0 0 0 rgba(255, 64, 129, 0.7);
+            animation: pulse 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
         }
-
-        .pin-homestay { background: linear-gradient(135deg, #00A8CC, #40C4FF); border: 2px solid #ffffff; }
-        .pin-wisata { background: linear-gradient(135deg, #00BFA5, #00A8CC); border: 2px solid #ffffff; }
-        .pin-kuliner { background: linear-gradient(135deg, #FF9100, #FF5252); border: 2px solid #ffffff; }
-        .pin-kumpul { background: linear-gradient(135deg, #FF4081, #FF5252); border: 2px solid #ffffff; }
-
-        /* Mobile app animation transitions */
-        .page-content {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.25s ease-in-out;
-        }
-        .page-content.active {
-            display: block;
-            opacity: 1;
-        }
-
-        /* Clean Light Glassmorphism */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(0, 168, 204, 0.15);
+        @keyframes pulse {
+            to {
+                box-shadow: 0 0 0 14px rgba(255, 64, 129, 0);
+            }
         }
     </style>
-</head>
-<body class="bg-white text-[#4A4A4A] flex flex-col h-screen overflow-hidden select-none">
 
-    <!-- Top App Bar (Android Header Style - Kop Biru Google #1A73E8) -->
-    <header class="bg-[#1A73E8] fixed top-0 left-0 right-0 z-50 px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between border-b border-blue-400/20 shadow-md min-w-0 gap-2">
-        <div class="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center text-white font-bold text-base sm:text-lg shadow-inner shrink-0">
-                <i class="fa-solid fa-map-location-dot"></i>
+    <!-- Manifest Inline (PWA Data) -->
+    <link rel="manifest" href='data:application/manifest+json,{
+        "name": "WebGIS Kota Batu Malang",
+        "short_name": "WebGIS Batu",
+        "start_url": ".",
+        "display": "standalone",
+        "background_color": "#FFFFFF",
+        "theme_color": "#1A73E8",
+        "icons": [{
+            "src": "https://cdn-icons-png.flaticon.com/512/854/854878.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }]
+    }'>
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col justify-between bg-white select-none">
+
+    <!-- TOP HEADER / KOP APP BAR (Biru Google #1A73E8) -->
+    <header class="bg-[#1A73E8] text-white px-3 sm:px-4 py-2.5 shadow-md flex items-center justify-between z-30 shrink-0">
+        <div class="flex items-center gap-2 min-w-0">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 bg-white/20 rounded-lg flex items-center justify-center shrink-0 border border-white/30 backdrop-blur-sm">
+                <i class="fa-solid fa-map-location-dot text-white text-base sm:text-lg"></i>
             </div>
-            <div class="min-w-0 flex-1">
-                <h1 class="text-xs sm:text-base font-bold tracking-wide text-white leading-tight truncate">Ayo ke Malang!</h1>
-                <p class="text-[9px] sm:text-[10px] text-blue-100 flex items-center gap-1 font-medium truncate">
-                    <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse shrink-0"></span> <span class="truncate">Putune Mbah Dul - Bandiyatun 2027</span>
+            <div class="min-w-0">
+                <h1 class="text-sm sm:text-base font-bold leading-tight truncate tracking-wide">WebGIS Kota Batu</h1>
+                <p class="text-[10px] sm:text-xs text-blue-100 font-medium truncate flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#FF9100] inline-block animate-pulse"></span>
+                    Hotel Selecta & Wisata Malang
                 </p>
             </div>
         </div>
-        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            <!-- PWA Install Button (Jingga / Oranye Tombol #FF9100) -->
-            <button id="pwa-install-btn" onclick="installPWA()" class="hidden px-2 sm:px-2.5 py-1 bg-[#FF9100] hover:bg-[#e68200] text-white rounded-lg text-[10px] sm:text-xs font-semibold flex items-center gap-1 shadow transition whitespace-nowrap">
-                <i class="fa-solid fa-download"></i> <span class="hidden xs:inline">Install</span>
+        <div class="flex items-center gap-1.5 shrink-0">
+            <div class="px-2 py-1 bg-white/15 rounded-full border border-white/25 flex items-center gap-1 text-[10px] sm:text-xs font-semibold text-white">
+                <i class="fa-solid fa-cloud-sun text-yellow-300"></i>
+                <span>19°C</span>
+            </div>
+            <button onclick="installPWA()" id="installBtn" class="hidden px-2.5 py-1 bg-[#FF9100] hover:bg-amber-600 text-white rounded-full text-[10px] sm:text-xs font-bold shadow-sm flex items-center gap-1 transition active:scale-95">
+                <i class="fa-solid fa-download"></i>
+                <span class="hidden sm:inline">Install</span>
             </button>
-            <span class="px-2 sm:px-2.5 py-1 bg-white/20 border border-white/30 text-white rounded-lg text-[10px] sm:text-xs font-semibold backdrop-blur-sm whitespace-nowrap">
-                <i class="fa-solid fa-cloud-sun text-yellow-300 mr-0.5 sm:mr-1"></i>21°C
-            </span>
         </div>
     </header>
 
-    <!-- Main Content Viewport -->
-    <main class="flex-1 pt-14 sm:pt-16 pb-24 sm:pb-28 overflow-y-auto relative bg-slate-50">
+    <!-- MAIN VIEW CONTAINER -->
+    <main class="flex-1 relative w-full h-full overflow-hidden pb-24 sm:pb-28">
 
-        <!-- ================= PAGE 1: MAP PAGE ================= -->
-        <section id="page-map" class="page-content active h-full relative">
-            <!-- Search & Filter Overlay -->
-            <div class="absolute top-2.5 sm:top-3 left-2 sm:left-3 right-2 sm:right-3 z-20 space-y-2">
-                <!-- Search Box -->
-                <div class="relative glass-panel rounded-2xl shadow-lg overflow-hidden border border-slate-200">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[#00A8CC] text-xs sm:text-sm"></i>
-                    <input type="text" id="map-search" placeholder="Cari wisata, homestay, atau kuliner..." 
-                           oninput="onSearchMap(this.value)"
-                           class="w-full bg-transparent pl-9 pr-9 py-2 sm:py-2.5 text-[11px] sm:text-xs text-[#4A4A4A] placeholder-slate-400 focus:outline-none">
-                    <button onclick="clearMapSearch()" id="clear-search-btn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#FF5252]">
-                        <i class="fa-solid fa-circle-xmark text-xs sm:text-sm"></i>
-                    </button>
-                </div>
-
-                <!-- Category Pills -->
-                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-                    <button onclick="filterCategory('all')" id="btn-cat-all" class="cat-pill active whitespace-nowrap shrink-0 px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-[#00BFA5] text-white shadow-md transition">
-                        <i class="fa-solid fa-layer-group mr-1"></i> Semua
-                    </button>
-                    <button onclick="filterCategory('kumpul')" id="btn-cat-kumpul" class="cat-pill whitespace-nowrap shrink-0 px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200 shadow-sm transition">
-                        <i class="fa-solid fa-flag-checkered text-[#FF4081] mr-1"></i> Titik Kumpul (1)
-                    </button>
-                    <button onclick="filterCategory('homestay')" id="btn-cat-homestay" class="cat-pill whitespace-nowrap shrink-0 px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200 shadow-sm transition">
-                        <i class="fa-solid fa-house-user text-[#00A8CC] mr-1"></i> Homestay ≤5KM (5)
-                    </button>
-                    <button onclick="filterCategory('wisata')" id="btn-cat-wisata" class="cat-pill whitespace-nowrap shrink-0 px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200 shadow-sm transition">
-                        <i class="fa-solid fa-mountain-sun text-[#00BFA5] mr-1"></i> Wisata (5)
-                    </button>
-                    <button onclick="filterCategory('kuliner')" id="btn-cat-kuliner" class="cat-pill whitespace-nowrap shrink-0 px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200 shadow-sm transition">
-                        <i class="fa-solid fa-utensils text-[#FF9100] mr-1"></i> Kuliner Legend (7)
-                    </button>
-                </div>
-            </div>
-
-            <!-- Leaflet Map Canvas -->
+        <!-- ================= PAGE 1: MAP VIEW ================= -->
+        <section id="page-map" class="w-full h-full relative">
+            <!-- Leaflet Map Container -->
             <div id="map"></div>
 
-            <!-- Floating Action Buttons on Map -->
-            <div class="absolute bottom-4 right-2 sm:right-3 z-20 flex flex-col gap-2">
-                <button onclick="toggleMapType()" title="Ganti Mode Peta" class="w-9 h-9 sm:w-10 sm:h-10 bg-white rounded-full text-[#4A4A4A] flex items-center justify-center shadow-md border border-slate-200 hover:bg-slate-100 active:scale-95 transition">
-                    <i class="fa-solid fa-map text-[#40C4FF] text-sm sm:text-base"></i>
+            <!-- Top Floating Filter Pills -->
+            <div class="absolute top-2 left-0 right-0 z-20 px-3 flex gap-1.5 overflow-x-auto no-scrollbar">
+                <button onclick="filterLocations('all')" class="filter-btn active shrink-0 px-3 py-1.5 bg-[#00BFA5] text-white rounded-full text-xs font-semibold shadow-md border border-white/40 transition active:scale-95">
+                    <i class="fa-solid fa-border-all mr-1"></i> Semua (9)
                 </button>
-                <button onclick="centerUserLocation()" title="Lokasi Saya" class="w-9 h-9 sm:w-10 sm:h-10 bg-white rounded-full text-[#00BFA5] flex items-center justify-center shadow-md border border-slate-200 hover:bg-slate-100 active:scale-95 transition">
-                    <i class="fa-solid fa-location-crosshairs text-base sm:text-lg"></i>
+                <button onclick="filterLocations('kumpul')" class="filter-btn shrink-0 px-3 py-1.5 bg-white text-[#FF4081] rounded-full text-xs font-semibold shadow-md border border-slate-200 transition active:scale-95">
+                    <i class="fa-solid fa-flag-checkered mr-1"></i> Titik Nol KM
+                </button>
+                <button onclick="filterLocations('homestay')" class="filter-btn shrink-0 px-3 py-1.5 bg-white text-[#00A8CC] rounded-full text-xs font-semibold shadow-md border border-slate-200 transition active:scale-95">
+                    <i class="fa-solid fa-hotel mr-1"></i> Hotel Selecta
+                </button>
+                <button onclick="filterLocations('wisata')" class="filter-btn shrink-0 px-3 py-1.5 bg-white text-[#00BFA5] rounded-full text-xs font-semibold shadow-md border border-slate-200 transition active:scale-95">
+                    <i class="fa-solid fa-[#00BFA5] mr-1 fa-tree"></i> Wisata Selecta
+                </button>
+                <button onclick="filterLocations('kuliner')" class="filter-btn shrink-0 px-3 py-1.5 bg-white text-[#FF9100] rounded-full text-xs font-semibold shadow-md border border-slate-200 transition active:scale-95">
+                    <i class="fa-solid fa-utensils mr-1"></i> Kuliner (7)
                 </button>
             </div>
 
-            <!-- Selected Location Bottom Card Sheet -->
-            <div id="map-bottom-sheet" class="hidden absolute bottom-2 sm:bottom-3 left-2 sm:left-3 right-2 sm:right-3 z-30 glass-panel p-3 sm:p-4 rounded-2xl shadow-2xl border border-slate-200 transition-all duration-300">
-                <div class="flex items-start justify-between gap-2">
-                    <div class="flex gap-2.5 sm:gap-3 min-w-0 flex-1">
-                        <img id="sheet-img" src="" class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover border border-slate-200 shadow shrink-0">
-                        <div class="min-w-0 flex-1">
-                            <span id="sheet-badge" class="px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-[#FF4081]/10 text-[#FF4081] border border-[#FF4081]/30">Wisata</span>
-                            <h3 id="sheet-title" class="font-bold text-[#4A4A4A] text-xs sm:text-sm mt-0.5 truncate">Nama Tempat</h3>
-                            <p id="sheet-desc" class="text-[11px] sm:text-xs text-slate-500 mt-0.5 truncate">Deskripsi singkat lokasi...</p>
-                            <p id="sheet-sub" class="text-[10px] sm:text-[11px] text-[#FF9100] mt-0.5 font-bold truncate"><i class="fa-solid fa-star mr-1"></i>4.8 • <span id="sheet-price" class="text-[#FF5252] font-semibold">Gratis</span></p>
+            <!-- Floating Action Controls on Right Side (Elevated above Bottom Bar) -->
+            <div class="absolute bottom-20 sm:bottom-24 right-2 sm:right-3 z-20 flex flex-col gap-2">
+                <button onclick="centerUserLocation()" title="Lokasi Saya" class="w-10 h-10 bg-white rounded-full text-[#00BFA5] flex items-center justify-center shadow-md border border-slate-200 hover:bg-slate-100 active:scale-95 transition">
+                    <i class="fa-solid fa-location-crosshairs text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Map Bottom Sheet Info (Elevated above Bottom Bar) -->
+            <div id="map-bottom-sheet" class="hidden absolute bottom-20 sm:bottom-24 left-3 right-3 z-20 bg-white rounded-2xl p-3 shadow-xl border border-slate-100 transition-all duration-300">
+                <div class="flex gap-3 items-center">
+                    <img id="sheet-img" src="" class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border border-slate-100 shrink-0" alt="Preview">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-1.5 mb-1">
+                            <span id="sheet-tag" class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase text-white bg-[#00BFA5]">Wisata</span>
+                            <span class="text-xs text-[#FF9100] font-bold"><i class="fa-solid fa-star"></i> <span id="sheet-rating">4.8</span></span>
+                        </div>
+                        <h3 id="sheet-title" class="font-bold text-xs sm:text-sm text-[#4A4A4A] truncate">Nama Tempat</h3>
+                        <div id="sheet-dist" class="mt-1 flex flex-wrap items-center gap-1.5 text-[11px]">
+                            <!-- Rendered dynamically -->
                         </div>
                     </div>
-                    <button onclick="closeBottomSheet()" class="text-slate-400 hover:text-[#FF5252] p-1 shrink-0">
-                        <i class="fa-solid fa-xmark text-base sm:text-lg"></i>
+                    <button onclick="closeBottomSheet()" class="text-slate-400 hover:text-slate-600 p-1 shrink-0">
+                        <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
                 </div>
-                <div class="mt-2.5 sm:mt-3 pt-2.5 sm:pt-3 border-t border-slate-200 flex gap-2">
-                    <!-- Tombol Bantuan #00A8CC -->
-                    <button id="sheet-detail-btn" class="flex-1 py-1.5 sm:py-2 bg-[#00A8CC] hover:bg-[#0092b3] text-white text-[11px] sm:text-xs font-semibold rounded-xl flex items-center justify-center gap-1 shadow-md">
+                <div class="grid grid-cols-2 gap-2 mt-2.5 pt-2 border-t border-slate-100">
+                    <button id="sheet-detail-btn" class="w-full py-1.5 bg-[#00A8CC] text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1">
                         <i class="fa-solid fa-circle-info"></i> Info Detail
                     </button>
-                    <!-- Tombol Oranye #FF9100 -->
-                    <a id="sheet-route-btn" target="_blank" class="flex-1 py-1.5 sm:py-2 bg-[#FF9100] hover:bg-[#e68200] text-white text-[11px] sm:text-xs font-semibold rounded-xl flex items-center justify-center gap-1 shadow-md">
-                        <i class="fa-solid fa-diamond-turn-right"></i> Petunjuk Arah
+                    <a id="sheet-route-btn" href="#" target="_blank" class="w-full py-1.5 bg-[#FF9100] text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1 text-center">
+                        <i class="fa-solid fa-diamond-turn-right"></i> Rute
                     </a>
                 </div>
             </div>
         </section>
 
-
-        <!-- ================= PAGE 2: DIRECTORY PAGE ================= -->
-        <section id="page-directory" class="page-content min-h-full p-3 sm:p-4 space-y-3.5 sm:space-y-4 pb-24">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h2 class="text-base sm:text-lg font-bold text-[#4A4A4A]">Direktori Lokasi</h2>
-                    <p class="text-[11px] sm:text-xs text-slate-500">Eksplorasi 18 destinasi & titik kumpul</p>
+        <!-- ================= PAGE 2: DIRECTORY VIEW ================= -->
+        <section id="page-directory" class="hidden w-full h-full overflow-y-auto px-3 py-3 bg-slate-50">
+            <!-- Search & Filters -->
+            <div class="sticky top-0 bg-slate-50 pt-1 pb-3 z-10 space-y-2">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs sm:text-sm"></i>
+                    <input type="text" id="dirSearch" oninput="searchDirectory()" placeholder="Cari Hotel Selecta, Kuliner, atau Titik Nol..." class="w-full pl-9 pr-3 py-2 bg-white rounded-xl text-xs sm:text-sm text-[#4A4A4A] border border-slate-200 shadow-sm focus:outline-none focus:border-[#00BFA5]">
                 </div>
-                <div class="text-[11px] sm:text-xs bg-[#00BFA5]/10 px-2.5 py-1 rounded-xl border border-[#00BFA5]/30 text-[#00BFA5] font-bold whitespace-nowrap">
-                    Total: <span id="dir-count">18</span>
+                <div class="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                    <button onclick="filterDirectory('all')" class="dir-filter active shrink-0 px-3 py-1 bg-[#00BFA5] text-white rounded-full text-xs font-medium shadow-sm">Semua</button>
+                    <button onclick="filterDirectory('kumpul')" class="dir-filter shrink-0 px-3 py-1 bg-white text-[#FF4081] border border-slate-200 rounded-full text-xs font-medium">Titik Nol KM</button>
+                    <button onclick="filterDirectory('homestay')" class="dir-filter shrink-0 px-3 py-1 bg-white text-[#00A8CC] border border-slate-200 rounded-full text-xs font-medium">Hotel Selecta</button>
+                    <button onclick="filterDirectory('wisata')" class="dir-filter shrink-0 px-3 py-1 bg-white text-[#00BFA5] border border-slate-200 rounded-full text-xs font-medium">Wisata Selecta</button>
+                    <button onclick="filterDirectory('kuliner')" class="dir-filter shrink-0 px-3 py-1 bg-white text-[#FF9100] border border-slate-200 rounded-full text-xs font-medium">Kuliner</button>
                 </div>
             </div>
 
-            <!-- Directory Filter Bar -->
-            <div class="flex gap-1.5 sm:gap-2 overflow-x-auto pb-1 no-scrollbar">
-                <button onclick="filterDir('all')" class="dir-tab active whitespace-nowrap shrink-0 px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold bg-[#00BFA5] text-white">Semua</button>
-                <button onclick="filterDir('kumpul')" class="dir-tab whitespace-nowrap shrink-0 px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200">Titik Kumpul</button>
-                <button onclick="filterDir('homestay')" class="dir-tab whitespace-nowrap shrink-0 px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200">Homestay (≤5 KM)</button>
-                <button onclick="filterDir('wisata')" class="dir-tab whitespace-nowrap shrink-0 px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200">Wisata</button>
-                <button onclick="filterDir('kuliner')" class="dir-tab whitespace-nowrap shrink-0 px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold bg-white text-[#4A4A4A] border border-slate-200">Kuliner Legend</button>
-            </div>
-
-            <!-- Directory List Cards -->
-            <div id="directory-list" class="space-y-2.5 sm:space-y-3 pb-8">
-                <!-- Dynamic injected cards -->
+            <!-- Directory Cards Container -->
+            <div id="directory-list" class="space-y-3">
+                <!-- Dynamically populated -->
             </div>
         </section>
 
-
-        <!-- ================= PAGE 3: RUNDOWN ACARA PAGE ================= -->
-        <section id="page-rundown" class="page-content min-h-full p-3 sm:p-4 space-y-4 pb-24 sm:pb-28">
-            <div>
-                <h2 class="text-base sm:text-lg font-bold text-[#4A4A4A]">Rundown & Itinerary</h2>
-                <p class="text-[11px] sm:text-xs text-slate-500">Rencanakan agenda kumpul keluarga di Kota Batu</p>
-            </div>
-
-            <!-- Tab Switcher -->
-            <div class="flex bg-slate-100 p-1 rounded-2xl border border-slate-200">
-                <button onclick="switchRundownTab('preset')" id="tab-btn-preset" class="flex-1 py-1.5 sm:py-2 text-[11px] sm:text-xs font-semibold rounded-xl bg-[#00BFA5] text-white shadow">
-                    <i class="fa-solid fa-compass mr-1"></i> Paket Rekomendasi
+        <!-- ================= PAGE 3: RUNDOWN VIEW ================= -->
+        <section id="page-rundown" class="hidden w-full h-full overflow-y-auto px-3 py-3 bg-slate-50">
+            <!-- Rundown Mode Sub-Tabs -->
+            <div class="bg-white p-1 rounded-xl shadow-sm border border-slate-200 flex mb-3">
+                <button onclick="switchRundownTab('preset')" id="tab-btn-preset" class="flex-1 py-1.5 rounded-lg text-xs font-bold bg-[#00BFA5] text-white transition">
+                    <i class="fa-solid fa-calendar-week mr-1"></i> Preset 3D2N
                 </button>
-                <button onclick="switchRundownTab('custom')" id="tab-btn-custom" class="flex-1 py-1.5 sm:py-2 text-[11px] sm:text-xs font-semibold rounded-xl text-slate-500 hover:text-[#4A4A4A]">
-                    <i class="fa-solid fa-pen-to-square mr-1"></i> Buat Agenda
+                <button onclick="switchRundownTab('custom')" id="tab-btn-custom" class="flex-1 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-700 transition">
+                    <i class="fa-solid fa-[#00A8CC] mr-1 fa-pen-to-square"></i> Buat Agenda
                 </button>
             </div>
 
-            <!-- TAB 1: PRESET ITINERARY (3D2N) -->
-            <div id="rundown-preset-view" class="space-y-3.5 sm:space-y-4 pb-8">
-                <div class="p-2.5 sm:p-3 bg-[#40C4FF]/10 border border-[#40C4FF]/30 rounded-2xl flex items-center gap-2.5 sm:gap-3">
-                    <i class="fa-solid fa-circle-info text-[#00A8CC] text-lg sm:text-xl shrink-0"></i>
-                    <p class="text-[11px] sm:text-xs text-[#4A4A4A]">Rencana perjalanan 3D2N dengan penugasan 1 PIC + 2 Anggota tiap sesi.</p>
-                </div>
-
-                <!-- Day 1 -->
-                <div class="bg-white rounded-2xl p-3 sm:p-4 space-y-3 border border-slate-200 shadow-sm">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-2 gap-1">
-                        <span class="text-[11px] sm:text-xs font-bold text-[#00BFA5] uppercase tracking-wider truncate"><i class="fa-solid fa-calendar-day mr-1"></i> Hari 1 - Wisata</span>
-                        <span class="text-[9px] sm:text-[10px] bg-[#FF4081]/10 text-[#FF4081] px-2 py-0.5 rounded-full font-bold whitespace-nowrap">Titik Nol KM</span>
-                    </div>
-                    <ul class="space-y-2.5 text-xs">
-                        <li class="flex items-start gap-2 sm:gap-3">
-                            <span class="font-bold text-slate-500 w-10 sm:w-12 shrink-0 text-[11px] sm:text-xs">08:00</span>
-                            <div class="bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-[#FF4081]/30 w-full min-w-0">
-                                <p class="font-bold text-[#FF4081] text-[11px] sm:text-xs truncate"><i class="fa-solid fa-flag-checkered mr-1"></i> Titik Nol KM - Masjid Jami' Batu</p>
-                                <p class="text-[10px] sm:text-[11px] text-slate-500">Kumpul awal seluruh keluarga Mbah Dul & doa bersama.</p>
-                                <div class="mt-1.5 flex flex-wrap gap-1 text-[9px] sm:text-[10px]">
-                                    <span class="px-1.5 py-0.5 rounded bg-[#00BFA5]/10 text-[#00BFA5] font-bold border border-[#00BFA5]/30"><i class="fa-solid fa-user-shield mr-1"></i>PIC: Mas Adit</span>
-                                    <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200"><i class="fa-solid fa-users mr-1"></i>Anggota: De Nafi, De Habib</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="flex items-start gap-2 sm:gap-3">
-                            <span class="font-bold text-slate-500 w-10 sm:w-12 shrink-0 text-[11px] sm:text-xs">09:30</span>
-                            <div class="bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200 w-full min-w-0">
-                                <p class="font-bold text-[#4A4A4A] text-[11px] sm:text-xs truncate">Taman Rekreasi Selecta</p>
-                                <p class="text-[10px] sm:text-[11px] text-slate-500">Menikmati udara sejuk & kebun bunga panorama.</p>
-                                <div class="mt-1.5 flex flex-wrap gap-1 text-[9px] sm:text-[10px]">
-                                    <span class="px-1.5 py-0.5 rounded bg-[#00BFA5]/10 text-[#00BFA5] font-bold border border-[#00BFA5]/30"><i class="fa-solid fa-user-shield mr-1"></i>PIC: De Liaye Wae</span>
-                                    <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200"><i class="fa-solid fa-users mr-1"></i>Anggota: Mas Nug, De' Indra</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="flex items-start gap-2 sm:gap-3">
-                            <span class="font-bold text-slate-500 w-10 sm:w-12 shrink-0 text-[11px] sm:text-xs">12:30</span>
-                            <div class="bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200 w-full min-w-0">
-                                <p class="font-bold text-[#FF9100] text-[11px] sm:text-xs truncate">Sate Kelinci Batu Organik</p>
-                                <p class="text-[10px] sm:text-[11px] text-slate-500">Makan siang kuliner khas kawasan Selecta.</p>
-                                <div class="mt-1.5 flex flex-wrap gap-1 text-[9px] sm:text-[10px]">
-                                    <span class="px-1.5 py-0.5 rounded bg-[#00BFA5]/10 text-[#00BFA5] font-bold border border-[#00BFA5]/30"><i class="fa-solid fa-user-shield mr-1"></i>PIC: Mas 603H</span>
-                                    <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200"><i class="fa-solid fa-users mr-1"></i>Anggota: Mas Penang, De Surya</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="flex items-start gap-2 sm:gap-3">
-                            <span class="font-bold text-slate-500 w-10 sm:w-12 shrink-0 text-[11px] sm:text-xs">15:00</span>
-                            <div class="bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200 w-full min-w-0">
-                                <p class="font-bold text-[#00A8CC] text-[11px] sm:text-xs truncate">Check-in Homestay (≤5 KM)</p>
-                                <p class="text-[10px] sm:text-[11px] text-slate-500">Istirahat sejenak di Homestay Bunga / Omah Heritage.</p>
-                                <div class="mt-1.5 flex flex-wrap gap-1 text-[9px] sm:text-[10px]">
-                                    <span class="px-1.5 py-0.5 rounded bg-[#00BFA5]/10 text-[#00BFA5] font-bold border border-[#00BFA5]/30"><i class="fa-solid fa-user-shield mr-1"></i>PIC: De Nafi</span>
-                                    <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200"><i class="fa-solid fa-users mr-1"></i>Anggota: Mas Adit, Mas Nug</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="flex items-start gap-2 sm:gap-3">
-                            <span class="font-bold text-slate-500 w-10 sm:w-12 shrink-0 text-[11px] sm:text-xs">19:00</span>
-                            <div class="bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200 w-full min-w-0">
-                                <p class="font-bold text-[#FF9100] text-[11px] sm:text-xs truncate">Pos Ketan Legenda 1967</p>
-                                <p class="text-[10px] sm:text-[11px] text-slate-500">Malam hari jalan-jalan & kulineran legendaris.</p>
-                                <div class="mt-1.5 flex flex-wrap gap-1 text-[9px] sm:text-[10px]">
-                                    <span class="px-1.5 py-0.5 rounded bg-[#00BFA5]/10 text-[#00BFA5] font-bold border border-[#00BFA5]/30"><i class="fa-solid fa-user-shield mr-1"></i>PIC: De Habib</span>
-                                    <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200"><i class="fa-solid fa-users mr-1"></i>Anggota: De Liaye Wae, De' Indra</span>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Day 2 -->
-                <div class="bg-white rounded-2xl p-3 sm:p-4 space-y-3 border border-slate-200 shadow-sm">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-2 gap-1">
-                        <span class="text-[11px] sm:text-xs font-bold text-[#00BFA5] uppercase tracking-wider truncate"><i class="fa-solid fa-calendar-day mr-1"></i> Hari 2 - Edukasi & Otomotif</span>
-                        <span class="text-[9px] sm:text-[10px] bg-[#FF4081]/10 text-[#FF4081] px-2 py-0.5 rounded-full font-bold whitespace-nowrap">Favorit</span>
-                    </div>
-                    <ul class="space-y-2.5 text-xs">
-                        <li class="flex items-start gap-2 sm:gap-3">
-                            <span class="font-bold text-slate-500 w-10 sm:w-12 shrink-0 text-[11px] sm:text-xs">08:30</span>
-                            <div class="bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200 w-full min-w-0">
-                                <p class="font-bold text-[#4A4A4A] text-[11px] sm:text-xs truncate">Jatim Park 2 (Secret Zoo)</p>
-                                <p class="text-[10px] sm:text-[11px] text-slate-500">Eksplorasi satwa modern & museum satwa.</p>
-                                <div class="mt-1.5 flex flex-wrap gap-1 text-[9px] sm:text-[10px]">
-                                    <span class="px-1.5 py-0.5 rounded bg-[#00BFA5]/10 text-[#00BFA5] font-bold border border-[#00BFA5]/30"><i class="fa-solid fa-user-shield mr-1"></i>PIC: Mas Nug</span>
-                                    <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200"><i class="fa-solid fa-users mr-1"></i>Anggota: Mas 603H, Mas Penang</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="flex items-start gap-2 sm:gap-3">
-                            <span class="font-bold text-slate-500 w-10 sm:w-12 shrink-0 text-[11px] sm:text-xs">13:00</span>
-                            <div class="bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200 w-full min-w-0">
-                                <p class="font-bold text-[#FF9100] text-[11px] sm:text-xs truncate">Bakso De'Koes / Pemuda</p>
-                                <p class="text-[10px] sm:text-[11px] text-slate-500">Santap Bakso Malang kuah kaldu segar.</p>
-                                <div class="mt-1.5 flex flex-wrap gap-1 text-[9px] sm:text-[10px]">
-                                    <span class="px-1.5 py-0.5 rounded bg-[#00BFA5]/10 text-[#00BFA5] font-bold border border-[#00BFA5]/30"><i class="fa-solid fa-user-shield mr-1"></i>PIC: De' Indra</span>
-                                    <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200"><i class="fa-solid fa-users mr-1"></i>Anggota: De Surya, Mas Adit</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="flex items-start gap-2 sm:gap-3">
-                            <span class="font-bold text-slate-500 w-10 sm:w-12 shrink-0 text-[11px] sm:text-xs">15:30</span>
-                            <div class="bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200 w-full min-w-0">
-                                <p class="font-bold text-[#4A4A4A] text-[11px] sm:text-xs truncate">Museum Angkut</p>
-                                <p class="text-[10px] sm:text-[11px] text-slate-500">Foto spot tematik zona Eropa & Gangster Amerika.</p>
-                                <div class="mt-1.5 flex flex-wrap gap-1 text-[9px] sm:text-[10px]">
-                                    <span class="px-1.5 py-0.5 rounded bg-[#00BFA5]/10 text-[#00BFA5] font-bold border border-[#00BFA5]/30"><i class="fa-solid fa-user-shield mr-1"></i>PIC: Mas Penang</span>
-                                    <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200"><i class="fa-solid fa-users mr-1"></i>Anggota: De Nafi, De Habib</span>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
+            <!-- PRESET RUNDOWN CONTENT -->
+            <div id="view-rundown-preset" class="space-y-4 pb-8">
+                <!-- Preset items rendered by JS -->
             </div>
 
-            <!-- TAB 2: CUSTOM AGENDA BUILDER -->
-            <div id="rundown-custom-view" class="hidden space-y-3.5 sm:space-y-4 pb-8">
-                <div class="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2.5 sm:space-y-3">
-                    <h3 class="text-[11px] sm:text-xs font-bold text-[#4A4A4A] uppercase tracking-wider">Tambah Item Agenda</h3>
-                    <div class="grid grid-cols-1 gap-2">
-                        <input type="time" id="cust-time" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-[#4A4A4A] focus:outline-none focus:border-[#00BFA5]">
-                        <select id="cust-location" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-[#4A4A4A] focus:outline-none focus:border-[#00BFA5]">
-                            <!-- Injected dynamically -->
-                      </select>
-                        <input type="text" id="cust-pic" placeholder="PIC / Penanggung Jawab (misal: Om Indra)" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-[#4A4A4A] focus:outline-none focus:border-[#00BFA5]">
-                        <input type="text" id="cust-note" placeholder="Catatan Tambahan (misal: Tiket online)" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-[#4A4A4A] focus:outline-none focus:border-[#00BFA5]">
-                        <button onclick="addCustomRundown()" class="w-full py-2 bg-[#FF9100] hover:bg-[#e68200] text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow">
-                            <i class="fa-solid fa-plus"></i> Tambahkan ke Jadwal
+            <!-- CUSTOM RUNDOWN CONTENT -->
+            <div id="view-rundown-custom" class="hidden space-y-4 pb-8">
+                <!-- Add New Item Form -->
+                <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+                    <h3 class="text-xs font-bold text-[#4A4A4A] flex items-center gap-1.5">
+                        <i class="fa-solid fa-[#FF9100] fa-plus-circle text-[#FF9100]"></i> Tambah Kegiatan Baru
+                    </h3>
+                    <form onsubmit="addCustomRundownItem(event)" class="space-y-2.5">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500">JAM</label>
+                                <input type="text" id="cust-time" placeholder="08:00 - 09:30" required class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium focus:outline-none focus:border-[#00BFA5]">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500">HARI / TANGGAL</label>
+                                <input type="text" id="cust-day" placeholder="Hari 1 / Tgl 1" required class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium focus:outline-none focus:border-[#00BFA5]">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500">NAMA KEGIATAN & LOKASI</label>
+                            <input type="text" id="cust-title" placeholder="Kumpul & Makan Bersama di Selecta" required class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium focus:outline-none focus:border-[#00BFA5]">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500">CATATAN / KETERANGAN</label>
+                            <input type="text" id="cust-desc" placeholder="Bawa baju ganti & perlengkapan air" class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium focus:outline-none focus:border-[#00BFA5]">
+                        </div>
+                        <button type="submit" class="w-full py-2 bg-[#FF9100] text-white rounded-xl text-xs font-bold shadow-sm active:scale-95 transition flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-check"></i> Simpan Agenda
                         </button>
-                    </div>
+                    </form>
                 </div>
 
-                <!-- Custom Agenda List -->
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-xs font-bold text-[#4A4A4A]">Jadwal Acara Saya</h3>
-                        <button onclick="clearCustomRundown()" class="text-[11px] text-[#FF5252] font-semibold hover:underline">Hapus Semua</button>
-                    </div>
-                    <div id="custom-rundown-list" class="space-y-2">
-                        <!-- Injected items -->
-                    </div>
+                <!-- Custom Agenda Items List -->
+                <div id="custom-rundown-list" class="space-y-2.5">
+                    <!-- Dynamic custom items -->
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- Detail Modal Dialog (Z-Index diperbaiki z-[60] & Fixed Footer Button) -->
-    <div id="detail-modal" class="hidden fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all">
-        <div class="bg-white w-full max-w-md max-h-[85vh] sm:max-h-[90vh] rounded-t-3xl sm:rounded-3xl flex flex-col overflow-hidden border border-slate-200 shadow-2xl">
-            <!-- Scrollable Body Content -->
-            <div class="overflow-y-auto p-4 sm:p-5 space-y-3 sm:space-y-4 flex-1">
-                <div class="flex justify-between items-start">
-                    <span id="modal-category" class="px-2.5 py-1 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-[#FF4081]/10 text-[#FF4081] border border-[#FF4081]/30">Kategori</span>
-                    <button onclick="closeModal()" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-500 hover:text-[#FF5252] flex items-center justify-center">
-                        <i class="fa-solid fa-xmark text-sm sm:text-base"></i>
-                    </button>
+    <!-- ================= DETAIL MODAL DIALOG (z-[60]) ================= -->
+    <div id="detail-modal" class="hidden fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl border border-slate-100 flex flex-col max-h-[85vh]">
+            
+            <!-- Modal Header / Image Bar -->
+            <div class="relative h-28 sm:h-36 shrink-0 bg-slate-800">
+                <img id="modal-img" src="" class="w-full h-full object-cover opacity-90" alt="Detail Image">
+                <button onclick="closeDetail()" class="absolute top-3 right-3 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+                <div class="absolute bottom-2 left-3">
+                    <span id="modal-tag" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase text-white bg-[#00BFA5] shadow-sm">Kategori</span>
                 </div>
-                
-                <img id="modal-img" src="" class="w-full h-28 sm:h-40 rounded-2xl object-cover border border-slate-200 shadow-sm">
-                
+            </div>
+
+            <!-- Modal Content Body -->
+            <div class="p-3.5 sm:p-5 overflow-y-auto space-y-3 flex-1 text-xs sm:text-sm text-[#4A4A4A]">
                 <div>
-                    <h2 id="modal-title" class="text-base sm:text-lg font-bold text-[#4A4A4A] leading-snug">Nama Tempat</h2>
-                    <p id="modal-sub" class="text-[11px] sm:text-xs text-[#FF9100] font-bold mt-0.5"><i class="fa-solid fa-star mr-1"></i><span id="modal-rating">4.8</span> • <span id="modal-price" class="text-[#FF5252]">Rp 50.000</span></p>
+                    <h2 id="modal-title" class="text-base sm:text-lg font-bold text-[#4A4A4A]">Nama tempat</h2>
+                    <p id="modal-rating" class="text-xs text-[#FF9100] font-semibold mt-0.5 flex items-center gap-1">
+                        <i class="fa-solid fa-star"></i> 5.0
+                    </p>
                 </div>
 
-                <p id="modal-desc" class="text-[11px] sm:text-xs text-slate-600 leading-relaxed">Deskripsi lengkap mengenai lokasi...</p>
-
-                <div class="space-y-1.5 sm:space-y-2 text-[11px] sm:text-xs bg-slate-50 p-2.5 sm:p-3 rounded-2xl border border-slate-200">
-                    <div class="flex items-start gap-2 text-slate-600">
-                        <i class="fa-solid fa-location-dot text-[#00BFA5] mt-0.5 shrink-0"></i>
-                        <span id="modal-address">Jl. Raya Batu No. 123, Kota Batu</span>
+                <!-- Clarified Distance Breakdown Card -->
+                <div id="modal-dist-box" class="p-2.5 bg-blue-50/80 border border-blue-200 rounded-xl space-y-1 text-xs text-[#1A73E8]">
+                    <div class="flex items-center justify-between font-bold">
+                        <span class="flex items-center gap-1.5 text-slate-700">
+                            <i class="fa-solid fa-hotel text-[#1A73E8]"></i> Acuan: Hotel Selecta
+                        </span>
+                        <span id="modal-dist-summary" class="text-[#FF9100] font-bold">~0 mnt</span>
                     </div>
-                    <div class="flex items-center gap-2 text-slate-600">
-                        <i class="fa-solid fa-clock text-[#00BFA5] shrink-0"></i>
-                        <span id="modal-hours">08:00 - 17:00 WIB</span>
+                    <div class="flex items-center justify-between text-[11px] text-slate-600 pt-1 border-t border-blue-100">
+                        <span>📏 Jarak Garis Lurus: <strong id="modal-straight-dist">0 km</strong></span>
+                        <span>🚗 Rute Jalan: <strong id="modal-road-dist">0 km</strong></span>
+                    </div>
+                </div>
+
+                <p id="modal-desc" class="text-slate-600 leading-relaxed text-xs">
+                    Deskripsi lengkap tempat lokasi wisata atau kuliner di Kota Batu.
+                </p>
+
+                <div class="space-y-1.5 pt-2 border-t border-slate-100 text-xs">
+                    <div class="flex items-start gap-2">
+                        <i class="fa-solid fa-location-dot text-[#00BFA5] mt-0.5 shrink-0"></i>
+                        <span id="modal-address" class="text-slate-600">Alamat Lengkap</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-clock text-[#00A8CC] shrink-0"></i>
+                        <span id="modal-hours" class="text-slate-600">Jam Operasional</span>
+                    </div>
+                    <div id="modal-price-box" class="flex items-center gap-2">
+                        <i class="fa-solid fa-tag text-[#FF5252] shrink-0"></i>
+                        <span id="modal-price" class="text-[#FF5252] font-semibold">Harga</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Sticky Action Footer (Selalu Terlihat di Layar HP) -->
-            <div class="p-3 sm:p-4 bg-white border-t border-slate-100 flex gap-2 shrink-0 pb-5 sm:pb-4 shadow-inner">
-                <button id="modal-show-map-btn" class="flex-1 py-2 sm:py-2.5 bg-[#00A8CC] hover:bg-[#0092b3] active:scale-95 text-white font-semibold rounded-xl text-[11px] sm:text-xs flex items-center justify-center gap-1 shadow">
-                    <i class="fa-solid fa-map-pin"></i> Lihat Peta
+            <!-- STICKY ACTION FOOTER -->
+            <div class="p-3 bg-slate-50 border-t border-slate-200 grid grid-cols-2 gap-2 shrink-0">
+                <button id="modal-view-map-btn" class="w-full py-2 bg-[#00A8CC] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1 shadow-sm active:scale-95 transition">
+                    <i class="fa-solid fa-map-pin"></i> Lihat di Peta
                 </button>
-                <a id="modal-route-btn" target="_blank" class="flex-1 py-2 sm:py-2.5 bg-[#FF9100] hover:bg-[#e68200] active:scale-95 text-white font-semibold rounded-xl text-[11px] sm:text-xs flex items-center justify-center gap-1 shadow">
+                <a id="modal-route-btn" href="#" target="_blank" class="w-full py-2 bg-[#FF9100] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1 shadow-sm text-center active:scale-95 transition">
                     <i class="fa-solid fa-diamond-turn-right"></i> Petunjuk Arah
                 </a>
             </div>
+
         </div>
     </div>
 
-
-    <!-- Bottom Navigation Bar (Android Navigation Bar - Biru Google #1A73E8) -->
-    <nav class="bg-[#1A73E8] fixed bottom-0 left-0 right-0 z-50 border-t border-blue-400/20 px-2 sm:px-6 py-1.5 sm:py-2 shadow-lg">
-        <div class="max-w-md mx-auto flex items-center justify-around sm:justify-between">
-            <button onclick="switchTab('map')" id="nav-map" class="nav-btn active flex flex-col items-center gap-0.5 text-white transition">
-                <div class="nav-pill px-2.5 sm:px-3 py-1 rounded-full bg-white/20 text-white">
-                    <i class="fa-solid fa-map-location-dot text-sm sm:text-base"></i>
-                </div>
-                <span class="text-[9px] sm:text-[10px] font-bold tracking-wide">Peta</span>
-            </button>
-            <button onclick="switchTab('directory')" id="nav-directory" class="nav-btn flex flex-col items-center gap-0.5 text-blue-200 hover:text-white transition">
-                <div class="nav-pill px-2.5 sm:px-3 py-1 rounded-full text-blue-200">
-                    <i class="fa-solid fa-list-ul text-sm sm:text-base"></i>
-                </div>
-                <span class="text-[9px] sm:text-[10px] font-bold tracking-wide">Direktori</span>
-            </button>
-            <button onclick="switchTab('rundown')" id="nav-rundown" class="nav-btn flex flex-col items-center gap-0.5 text-blue-200 hover:text-white transition">
-                <div class="nav-pill px-2.5 sm:px-3 py-1 rounded-full text-blue-200">
-                    <i class="fa-solid fa-calendar-check text-sm sm:text-base"></i>
-                </div>
-                <span class="text-[9px] sm:text-[10px] font-bold tracking-wide">Rundown</span>
-            </button>
-        </div>
+    <!-- ================= BOTTOM NAVIGATION BAR (Biru Google #1A73E8) ================= -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-[#1A73E8] shadow-lg border-t border-blue-600 flex items-center justify-around px-2 sm:px-6 py-2">
+        <button onclick="switchTab('map')" id="nav-btn-map" class="nav-btn active flex flex-col items-center gap-1 px-4 py-1 rounded-xl text-white bg-white/20 transition">
+            <i class="fa-solid fa-map text-base sm:text-lg"></i>
+            <span class="text-[10px] font-bold">Peta</span>
+        </button>
+        <button onclick="switchTab('directory')" id="nav-btn-directory" class="nav-btn flex flex-col items-center gap-1 px-4 py-1 rounded-xl text-blue-200 hover:text-white transition">
+            <i class="fa-solid fa-list-ul text-base sm:text-lg"></i>
+            <span class="text-[10px] font-bold">Direktori</span>
+        </button>
+        <button onclick="switchTab('rundown')" id="nav-btn-rundown" class="nav-btn flex flex-col items-center gap-1 px-4 py-1 rounded-xl text-blue-200 hover:text-white transition">
+            <i class="fa-solid fa-calendar-check text-base sm:text-lg"></i>
+            <span class="text-[10px] font-bold">Rundown</span>
+        </button>
     </nav>
 
-
-    <!-- JavaScript Application Logic -->
+    <!-- JS LOGIC & DATA -->
     <script>
-        /* ================= DATA POINTS (18 POIs) ================= */
+        /* ================= DATA LOCATIONS (9 LOCATIONS) ================= */
+        const HOTEL_SELECTA_COORDS = [-7.822222, 112.527500];
+
         const locations = [
-            // TITIK KUMPUL & NOL KM (1 Titik)
             {
-                id: 'kumpul1',
-                name: 'Titik Nol KM - Masjid Jami\' An-Nuur Batu',
+                id: 'nol1',
+                title: "Titik Nol KM - Masjid Jami' An-Nuur Batu",
                 category: 'kumpul',
-                lat: -7.8711,
-                lng: 112.5261,
+                lat: -7.8712,
+                lng: 112.5270,
                 rating: 5.0,
-                price: 'Pusat Titik Kumpul',
-                address: 'Samping Barat Alun-Alun Kota Batu, Sisir, Kec. Batu',
-                hours: '24 Jam (Titik Kumpul Rombongan)',
-                image: 'https://images.unsplash.com/photo-1564769625905-50e93615e769?auto=format&fit=crop&w=600&q=80',
-                desc: 'Titik Nol Kilometer Kota Batu sekaligus Titik Kumpul Utama Rombongan Mbah Dul-Bandiyatun. Berada di sebelah barat Alun-Alun Batu.'
+                desc: "Titik Nol Kilometer Kota Batu sekaligus Pusat Titik Kumpul Utama Rombongan Mbah Dul-Bandiyatun. Berada di sebelah barat Alun-Alun Batu.",
+                address: "Samping Barat Alun-Alun Kota Batu, Sisir, Kec. Batu",
+                hours: "24 Jam (Titik Kumpul Rombongan)",
+                price: "Fasilitas Umum & Masjid",
+                img: "https://images.unsplash.com/photo-1591604466107-ec97de577aff?w=500&auto=format&fit=crop"
             },
-
-            // HOMESTAY RADIUS <= 5 KM (5 Titik)
             {
-                id: 'p1',
-                name: 'Homestay Kampoeng Bunga Oro-Oro Ombo',
+                id: 'hotel1',
+                title: "Hotel Selecta Batu",
                 category: 'homestay',
-                lat: -7.8875,
-                lng: 112.5312,
+                lat: -7.822222,
+                lng: 112.527500,
                 rating: 4.8,
-                price: 'Rp 250.000 / malam',
-                address: 'Jl. Terusan Oro-Oro Ombo, Kec. Batu (Radius 2.0 KM)',
-                hours: '24 Jam (Check-in 13:00)',
-                image: 'https://images.unsplash.com/photo-1587061949409-02df41d5e562?auto=format&fit=crop&w=600&q=80',
-                desc: 'Homestay keluarga nyaman & bersih di pusat Desa Wisata Oro-Oro Ombo, berjarak 2 KM dari alun-alun & dekat BNS.'
+                desc: "Hotel legendaris dengan pemandangan pegunungan segar dan akses langsung ke taman bunga Selecta. Tempat bermalam utama keluarga.",
+                address: "Jl. Raya Selecta No.1, Tulungrejo, Kec. Bumiaji, Kota Batu",
+                hours: "Check-in 14:00, Check-out 12:00",
+                price: "Rp 450.000 - Rp 850.000 / malam",
+                img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500&auto=format&fit=crop"
             },
             {
-                id: 'p2',
-                name: 'Omah Heritage Homestay Pesanggrahan',
-                category: 'homestay',
-                lat: -7.8750,
-                lng: 112.5180,
+                id: 'wisata1',
+                title: "Taman Rekreasi Selecta",
+                category: 'wisata',
+                lat: -7.819777,
+                lng: 112.526278,
                 rating: 4.7,
-                price: 'Rp 300.000 / malam',
-                address: 'Jl. Suropati, Pesanggrahan, Kec. Batu (Radius 1.2 KM)',
-                hours: '24 Jam',
-                image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80',
-                desc: 'Homestay bernuansa Jawa klasik hangat berjarak hanya 1.2 KM dari Alun-Alun Batu, cocok untuk rombongan keluarga.'
+                desc: "Taman wisata keluarga legendaris di Kota Batu dengan wahana kolam renang alami, taman bunga warna-warni, sky bike, dan udara pegunungan yang sangat sejuk.",
+                address: "Jl. Raya Selecta No.1, Tulungrejo, Kec. Bumiaji, Batu",
+                hours: "07:00 - 17:00 WIB",
+                price: "Tiket Masuk: Rp 50.000 / orang",
+                img: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=500&auto=format&fit=crop"
             },
             {
-                id: 'p3',
-                name: 'Griya Shanta Homestay Temas',
-                category: 'homestay',
-                lat: -7.8820,
-                lng: 112.5350,
-                rating: 4.6,
-                price: 'Rp 200.000 / malam',
-                address: 'Jl. Wukir, Temas, Kec. Batu (Radius 1.8 KM)',
-                hours: '24 Jam',
-                image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&q=80',
-                desc: 'Homestay terjangkau dengan dapur bersama & carport luas, hanya 1.8 KM dari Alun-Alun Kota Batu.'
-            },
-            {
-                id: 'p4',
-                name: 'Homestay Omah Londo Songgokerto',
-                category: 'homestay',
-                lat: -7.8630,
-                lng: 112.5120,
-                rating: 4.7,
-                price: 'Rp 350.000 / malam',
-                address: 'Jl. Arumdalu, Songgokerto, Kec. Batu (Radius 2.1 KM)',
-                hours: '24 Jam',
-                image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=600&q=80',
-                desc: 'Homestay villa bergaya vintage Eropa di kawasan pegunungan Songgokerto yang sejuk, hanya 2.1 KM dari Alun-alun.'
-            },
-            {
-                id: 'p5',
-                name: 'Homestay Bunga Sisir Center',
-                category: 'homestay',
-                lat: -7.8690,
-                lng: 112.5290,
-                rating: 4.9,
-                price: 'Rp 220.000 / malam',
-                address: 'Jl. Kartini, Sisir, Kec. Batu (Radius 0.4 KM)',
-                hours: '24 Jam',
-                image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=600&q=80',
-                desc: 'Homestay super strategis di jantung Kota Batu (radius < 500m dari Alun-Alun), sangat dekat dengan kawasan kuliner.'
-            },
-
-            // WISATA KELUARGA (5 Titik)
-            {
-                id: 'w1',
-                name: 'Jatim Park 1',
-                category: 'wisata',
-                lat: -7.8838,
-                lng: 112.5255,
-                rating: 4.7,
-                price: 'Rp 100.000 / orang',
-                address: 'Jl. Kartika No.2, Sisir, Kec. Batu',
-                hours: '08:30 - 16:30 WIB',
-                image: 'https://images.unsplash.com/photo-1513889961551-628c1e5e2ee9?auto=format&fit=crop&w=600&q=80',
-                desc: 'Taman edukasi & rekreasi keluarga dengan puluhan wahana permainan ekstrem, science center interaktif, dan kolam renang wahana air.'
-            },
-            {
-                id: 'w2',
-                name: 'Jatim Park 2 (Batu Secret Zoo)',
-                category: 'wisata',
-                lat: -7.8893,
-                lng: 112.5290,
-                rating: 4.9,
-                price: 'Rp 130.000 / orang',
-                address: 'Jl. Oro-Oro Ombo No.9, Temas, Kec. Batu',
-                hours: '08:30 - 16:30 WIB',
-                image: 'https://images.unsplash.com/photo-1534567153574-2b12153a87f0?auto=format&fit=crop&w=600&q=80',
-                desc: 'Kebun binatang modern taraf internasional dengan konsep terbuka modern, Museum Satwa, serta Sweet Memories Park.'
-            },
-            {
-                id: 'w3',
-                name: 'Jatim Park 3 (Dino Park)',
-                category: 'wisata',
-                lat: -7.8995,
-                lng: 112.5535,
-                rating: 4.8,
-                price: 'Rp 120.000 / orang',
-                address: 'Jl. Ir Soekarno No.344, Beji, Junrejo, Kota Batu',
-                hours: '11:00 - 20:00 WIB',
-                image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80',
-                desc: 'Destinasi masa purba bertema dinosaurus dengan replika bergerak skala 1:1, Jelajah 5 Zaman, serta The Legend Stars.'
-            },
-            {
-                id: 'w4',
-                name: 'Museum Angkut',
-                category: 'wisata',
-                lat: -7.8785,
-                lng: 112.5200,
-                rating: 4.8,
-                price: 'Rp 110.000 / orang',
-                address: 'Jl. Terusan Sultan Agung No.2, Ngaglik, Kec. Batu',
-                hours: '12:00 - 20:00 WIB',
-                image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=600&q=80',
-                desc: 'Museum transportasi pertama di Asia Tenggara yang menampilkan ratusan koleksi mobil & angkutan legendaris dari seluruh belahan dunia.'
-            },
-            {
-                id: 'w5',
-                name: 'Taman Rekreasi Selecta',
-                category: 'wisata',
-                lat: -7.8282,
-                lng: 112.5251,
-                rating: 4.6,
-                price: 'Rp 50.000 / orang',
-                address: 'Jl. Raya Selecta No.1, Tulungrejo, Bumiaji, Kota Batu',
-                hours: '07:00 - 17:00 WIB',
-                image: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=600&q=80',
-                desc: 'Taman bunga klasik legendaris sejak era kolonial Belanda dengan hamparan bunga berwarna-warni, kolam renang alami, dan sepeda udara.'
-            },
-
-            // KULINER LEGEND PINGGIR JALAN (7 Titik)
-            {
-                id: 'k1',
-                name: 'Pos Ketan Legenda 1967',
-                category: 'kuliner',
-                lat: -7.8711,
-                lng: 112.5271,
-                rating: 4.6,
-                price: 'Rp 10.000 - 25.000',
-                address: 'Alun-Alun Kota Batu Barat, Sisir, Kec. Batu',
-                hours: '10:00 - 00:00 WIB',
-                image: 'https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?auto=format&fit=crop&w=600&q=80',
-                desc: 'Kuliner ketan legendaris sejak 1967 dengan aneka topping melimpah seperti durian, keju, susu, meses, hingga nangka.'
-            },
-            {
-                id: 'k2',
-                name: 'Sate Kelinci Batu Organik',
-                category: 'kuliner',
-                lat: -7.8512,
-                lng: 112.5230,
-                rating: 4.5,
-                price: 'Rp 30.000 / porsi',
-                address: 'Jl. Raya Selecta No. 15, Bumiaji, Kota Batu',
-                hours: '09:00 - 21:00 WIB',
-                image: 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=600&q=80',
-                desc: 'Sate daging kelinci khas pegunungan Batu yang empuk dan kaya rempah disajikan dengan bumbu kacang gurih manis.'
-            },
-            {
-                id: 'k3',
-                name: 'Warung Sidik Batu (Soto & Rawon)',
-                category: 'kuliner',
-                lat: -7.8745,
-                lng: 112.5285,
-                rating: 4.7,
-                price: 'Rp 20.000 - 35.000',
-                address: 'Jl. KH Agus Salim No.30, Temas, Kec. Batu',
-                hours: '06:00 - 16:00 WIB',
-                image: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=600&q=80',
-                desc: 'Warung makan legendaris sejak 1965 menyajikan Soto Ayam Kampung dan Nasi Rawon khas Jawa Timur resep otentik.'
-            },
-            {
-                id: 'k4',
-                name: 'Lok-Lok Satay & Ketan Alun-Alun',
+                id: 'kuliner1',
+                title: "Pos Ketan Legenda 1967",
                 category: 'kuliner',
                 lat: -7.8708,
-                lng: 112.5268,
-                rating: 4.5,
-                price: 'Rp 15.000 - 30.000',
-                address: 'Area Pedagang Bangku Alun-Alun Batu',
-                hours: '16:00 - 23:00 WIB',
-                image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80',
-                desc: 'Jajanan street food sate seafood bakar bumbu pedas manis panggang yang selalu diburu pengunjung alun-alun Batu malam hari.'
+                lng: 112.5265,
+                rating: 4.8,
+                desc: "Kuliner ketan aneka toping legendaris di pinggir jalan barat Alun-Alun Batu yang berdiri sejak tahun 1967.",
+                address: "Jl. Pos No.1, Sisir, Kec. Batu, Kota Batu",
+                hours: "15:00 - 00:00 WIB",
+                price: "Rp 8.000 - Rp 18.000",
+                img: "https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=500&auto=format&fit=crop"
             },
             {
-                id: 'k5',
-                name: 'Bakso De\'Koes / Pemuda Batu',
+                id: 'kuliner2',
+                title: "Sate Kelinci Batu Legendaris",
                 category: 'kuliner',
                 lat: -7.8732,
-                lng: 112.5245,
-                rating: 4.6,
-                price: 'Rp 15.000 - 25.000',
-                address: 'Jl. Matsaid No.22, Pesanggrahan, Kec. Batu',
-                hours: '10:00 - 20:00 WIB',
-                image: 'https://images.unsplash.com/photo-1603073163308-9654c3fb70b5?auto=format&fit=crop&w=600&q=80',
-                desc: 'Bakso Malang pinggir jalan otentik dengan kuah kaldu sapi bening gurih, bakso halus, bakso urat, dan gorengan renyah.'
-            },
-            {
-                id: 'k6',
-                name: 'Tahwa & Angsle Alun-alun Batu',
-                category: 'kuliner',
-                lat: -7.8715,
-                lng: 112.5275,
-                rating: 4.7,
-                price: 'Rp 8.000 - 12.000',
-                address: 'Trotoar Utara Alun-Alun Kota Batu',
-                hours: '17:00 - 23:30 WIB',
-                image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
-                desc: 'Minuman hangat tradisional Kembang Tahu (Tahwa) berkuah jahe hangat manis dan Wedang Angsle cocok dipadukan udara dingin Batu.'
-            },
-            {
-                id: 'k7',
-                name: 'Sate Ayam & Kambing Bang Saleh',
-                category: 'kuliner',
-                lat: -7.8762,
                 lng: 112.5298,
                 rating: 4.6,
-                price: 'Rp 25.000 - 40.000',
-                address: 'Jl. VT Haryono No.7, Songgokerto, Kec. Batu',
-                hours: '10:00 - 22:00 WIB',
-                image: 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=600&q=80',
-                desc: 'Kuliner sate khas dengan bumbu kacang tebal dan kecap kental bumbu rempah legendaris favorit warga lokal Batu.'
+                desc: "Sate kelinci empuk khas Batu dengan racikan bumbu kacang gurih manis di sepanjang pinggir jalan utama.",
+                address: "Jl. Pattimura No.126, Temas, Kec. Batu",
+                hours: "10:00 - 22:00 WIB",
+                price: "Rp 25.000 - Rp 40.000",
+                img: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=500&auto=format&fit=crop"
+            },
+            {
+                id: 'kuliner3',
+                title: "Warung Sidik Batu (Nasi Campur)",
+                category: 'kuliner',
+                lat: -7.8715,
+                lng: 112.5251,
+                rating: 4.7,
+                desc: "Warung kuliner rumahan Jawa legendaris sejak era 1970-an, favorit sarapan dan makan siang rombongan.",
+                address: "Jl. Agus Salim No.47, Temas, Kec. Batu",
+                hours: "06:00 - 16:00 WIB",
+                price: "Rp 15.000 - Rp 30.000",
+                img: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=500&auto=format&fit=crop"
+            },
+            {
+                id: 'kuliner4',
+                title: "Bakso De'Manis & President Batu",
+                category: 'kuliner',
+                lat: -7.8689,
+                lng: 112.5240,
+                rating: 4.7,
+                desc: "Bakso Malang legendaris pinggir jalan lengkap dengan bakso bakar pedas, kuah gurih hangat, dan siomay kukus.",
+                address: "Jl. Sudarno No.18, Ngaglik, Kec. Batu",
+                hours: "10:00 - 21:00 WIB",
+                price: "Rp 12.000 - Rp 25.000",
+                img: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=500&auto=format&fit=crop"
+            },
+            {
+                id: 'kuliner5',
+                title: "Lalapan & Bebek Goreng Ambalika",
+                category: 'kuliner',
+                lat: -7.8741,
+                lng: 112.5285,
+                rating: 4.5,
+                desc: "Kuliner bebek goreng empuk dengan sambal korek dan lalapan segar khas Batu Malang.",
+                address: "Jl. Diponegoro No.88, Sisir, Kec. Batu",
+                hours: "11:00 - 23:00 WIB",
+                price: "Rp 20.000 - Rp 35.000",
+                img: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=500&auto=format&fit=crop"
+            },
+            {
+                id: 'kuliner6',
+                title: "Cwie Mie Malang & Ronde Titoni",
+                category: 'kuliner',
+                lat: -7.8701,
+                lng: 112.5278,
+                rating: 4.7,
+                desc: "Cwie mie taburan ayam halus dan hangatnya wedang ronde kacang cocok untuk suasana dingin malam hari Batu.",
+                address: "Jl. Gajah Mada No.15, Sisir, Kec. Batu",
+                hours: "16:00 - 23:00 WIB",
+                price: "Rp 10.000 - Rp 20.000",
+                img: "https://images.unsplash.com/photo-1555126634-323283e090fa?w=500&auto=format&fit=crop"
+            },
+            {
+                id: 'kuliner7',
+                title: "Jajanan Pinggir Jalan Alun-Alun Batu",
+                category: 'kuliner',
+                lat: -7.8710,
+                lng: 112.5273,
+                rating: 4.6,
+                desc: "Pusat sentra jajanan sate sosis, lok-lok, jagung bakar, dan susu murni hangat di sekeliling Alun-Alun Batu.",
+                address: "Kawasan Pedestrian Alun-Alun Batu",
+                hours: "16:00 - 00:00 WIB",
+                price: "Rp 5.000 - Rp 15.000",
+                img: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=500&auto=format&fit=crop"
             }
         ];
 
-        /* ================= POOL PERSONIL / PIC & ANGGOTA ================= */
-        const picPool = [
-            "Mas Adit", "De Nafi", "De Habib", "De Liaye Wae", 
-            "Mas Nug", "De' Indra", "Mas 603H", "Mas Penang", "De Surya"
+        /* ================= PERSONNELS (9 NAMES) ================= */
+        const PERSONNELS = [
+            'Mas Adit', 
+            'De Nafi', 
+            'De Habib', 
+            'De Liaye Wae', 
+            'Mas Nug', 
+            "De' Indra", 
+            'Mas 603H', 
+            'Mas Penang', 
+            'De Surya'
         ];
 
-        // Generator Kombinasi Acak (1 PIC & 2 Anggota tanpa duplikasi)
-        function getRandomDutyGroup() {
-            const shuffled = [...picPool].sort(() => 0.5 - Math.random());
+        // Randomly pick 1 PIC and 2 unique members from personnel list
+        function getRandomPersonnel() {
+            const shuffled = [...PERSONNELS].sort(() => 0.5 - Math.random());
             return {
                 pic: shuffled[0],
                 members: [shuffled[1], shuffled[2]]
             };
         }
 
-        /* ================= MAP INITIALIZATION (ESRI SATELLITE) ================= */
+        /* Preset 3D2N Itinerary Items */
+        const presetItinerary = [
+            {
+                day: "HARI 1 - Kedatangan & Titik Kumpul",
+                time: "08:00 WIB",
+                title: "Titik Kumpul Utama - Masjid Jami' An-Nuur Batu",
+                desc: "Koordinasi awal seluruh rombongan keluarga Mbah Dul - Bandiyatun di Titik Nol KM Alun-Alun Batu.",
+                cat: "Kumpul"
+            },
+            {
+                day: "HARI 1 - Kedatangan & Titik Kumpul",
+                time: "10:30 WIB",
+                title: "Check-in Hotel Selecta Batu",
+                desc: "Pembagian kamar hotel, meletakkan bagasi, dan istirahat sejenak sambil menikmati pemandangan alam.",
+                cat: "Hotel"
+            },
+            {
+                day: "HARI 1 - Kedatangan & Titik Kumpul",
+                time: "13:00 WIB",
+                title: "Makan Siang - Warung Sidik Batu",
+                desc: "Menikmati nasi campur resep legendaris Jawa.",
+                cat: "Kuliner"
+            },
+            {
+                day: "HARI 1 - Kedatangan & Titik Kumpul",
+                time: "18:30 WIB",
+                title: "Wisata Kuliner Malam - Pos Ketan Legenda 1967",
+                desc: "Santai malam di Alun-Alun Batu dan mencicipi ketan aneka rasa.",
+                cat: "Kuliner"
+            },
+            {
+                day: "HARI 2 - Rekreasi Selecta & Kuliner Legendaris",
+                time: "07:30 WIB",
+                title: "Eksplor Taman Rekreasi Selecta",
+                desc: "Jalan santai di taman bunga, wahana air, dan berfoto keluarga.",
+                cat: "Wisata"
+            },
+            {
+                day: "HARI 2 - Rekreasi Selecta & Kuliner Legendaris",
+                time: "12:30 WIB",
+                title: "Makan Siang - Bakso De'Manis & Bakso Bakar",
+                desc: "Kuliner khas Malang hangat yang menggugah selera.",
+                cat: "Kuliner"
+            },
+            {
+                day: "HARI 2 - Rekreasi Selecta & Kuliner Legendaris",
+                time: "19:00 WIB",
+                title: "Makan Malam - Sate Kelinci Batu Legendaris",
+                desc: "Makan malam bersama seluruh anggota keluarga besar.",
+                cat: "Kuliner"
+            }
+        ];
+
+        /* Custom Rundown Items Storage */
+        let customRundownItems = JSON.parse(localStorage.getItem('batu_custom_rundown')) || [
+            {
+                id: 1,
+                day: "Hari 3",
+                time: "08:00 - 10:00",
+                title: "Belanja Oleh-Oleh Apel & Keripik khas Batu",
+                desc: "Beli buah apel segar dan oleh-oleh di toko sekitar Selecta.",
+                pic: "Mas Adit",
+                members: ["De Nafi", "De Habib"]
+            }
+        ];
+
+        /* ================= GLOBALS & MAP VARS ================= */
         let map;
         let markersGroup = [];
-        let activeSatellite = true;
-        let esriSatLayer, esriLabelsLayer, osmLayer;
+        let esriSatLayer, esriLabelsLayer;
         let currentFilter = 'all';
 
-        function initMap() {
-            // Batu City Coordinates
-            const batuCenter = [-7.8705, 112.5270];
+        /* Calculate straight distance & car time from Hotel Selecta */
+        function calculateFromSelecta(lat, lng) {
+            const lat1 = HOTEL_SELECTA_COORDS[0];
+            const lon1 = HOTEL_SELECTA_COORDS[1];
+            const R = 6371; // Earth radius in km
+            const dLat = (lat - lat1) * Math.PI / 180;
+            const dLon = (lng - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const straightKm = R * c;
             
+            // Estimated road distance ~1.3x for mountain winding roads
+            const roadKm = straightKm * 1.3;
+            // Avg speed 22 km/h in Batu hill areas
+            const totalMinutes = Math.max(2, Math.round((roadKm / 22) * 60));
+
+            let timeText = "";
+            if (totalMinutes < 60) {
+                timeText = `${totalMinutes} menit`;
+            } else {
+                const hrs = Math.floor(totalMinutes / 60);
+                const mins = totalMinutes % 60;
+                timeText = `${hrs} jam ${mins} menit`;
+            }
+
+            return {
+                straightKm: straightKm.toFixed(1),
+                roadKm: roadKm.toFixed(1),
+                timeMinutes: totalMinutes,
+                timeText: timeText
+            };
+        }
+
+        /* Toggle Satellite vs OSM */
+        function toggleMapType() {
+            if (!map) return;
+            if (activeSatellite) {
+                if (map.hasLayer(esriSatLayer)) map.removeLayer(esriSatLayer);
+                if (map.hasLayer(esriLabelsLayer)) map.removeLayer(esriLabelsLayer);
+                if (!map.hasLayer(osmLayer)) map.addLayer(osmLayer);
+                activeSatellite = false;
+                showToast("Mode Peta: Jalan (OpenStreetMap)");
+            } else {
+                if (map.hasLayer(osmLayer)) map.removeLayer(osmLayer);
+                if (!map.hasLayer(esriSatLayer)) map.addLayer(esriSatLayer);
+                if (!map.hasLayer(esriLabelsLayer)) map.addLayer(esriLabelsLayer);
+                activeSatellite = true;
+                showToast("Mode Peta: Satelit (Esri)");
+            }
+        }
+
+        /* GPS Location */
+        function centerUserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    if (map) {
+                        map.flyTo([lat, lng], 15);
+                        L.marker([lat, lng]).addTo(map).bindPopup("<b>Lokasi Anda</b>").openPopup();
+                    }
+                    showToast("Lokasi Anda berhasil ditemukan!");
+                }, () => {
+                    showToast("Gagal mengambil lokasi GPS.");
+                });
+            } else {
+                showToast("Geolokasi tidak didukung.");
+            }
+        }
+
+        /* Toast Helper */
+        function showToast(message) {
+            let toast = document.getElementById('toast-notification');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast-notification';
+                toast.className = 'fixed top-16 left-1/2 -translate-x-1/2 z-[70] bg-[#4A4A4A] text-white px-3.5 py-2 rounded-xl shadow-lg text-xs font-semibold transition-all duration-300 opacity-0 pointer-events-none whitespace-nowrap border border-white/20';
+                document.body.appendChild(toast);
+            }
+            toast.innerText = message;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        /* ================= INITIALIZE MAP ================= */
+        function initMap() {
+            // Center around Batu - Selecta
             map = L.map('map', {
+                center: [-7.8450, 112.5260],
+                zoom: 13,
                 zoomControl: false
-            }).setView(batuCenter, 14);
+            });
 
-            // ESRI Satellite Tile Layer
+            // ESRI Satellite & Labels Layers
             esriSatLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                maxZoom: 19,
-                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS'
+                attribution: 'Tiles &copy; Esri'
             });
 
-            // ESRI Labels Overlay
-            esriLabelsLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-                maxZoom: 19
+            esriLabelsLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}', {
+                attribution: ''
             });
 
-            // Standard OSM fallback layer
-            osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; OpenStreetMap'
-            });
-
-            // Add Satellite + Labels as default
             esriSatLayer.addTo(map);
             esriLabelsLayer.addTo(map);
 
-            // Add Zoom Controls to top right
-            L.control.zoom({ position: 'topright' }).addTo(map);
-
-            // Render markers
-            renderMapMarkers(locations);
+            renderMapMarkers('all');
         }
 
-        // Custom Marker Icon Generator
-        function createCustomIcon(category) {
-            let iconClass = 'fa-location-dot';
-            let pinClass = 'pin-wisata';
-
-            if (category === 'kumpul') {
-                iconClass = 'fa-flag-checkered';
-                pinClass = 'pin-kumpul';
-            } else if (category === 'homestay' || category === 'penginapan') {
-                iconClass = 'fa-house-user';
-                pinClass = 'pin-homestay';
-            } else if (category === 'kuliner') {
-                iconClass = 'fa-utensils';
-                pinClass = 'pin-kuliner';
-            } else {
-                iconClass = 'fa-mountain-sun';
-                pinClass = 'pin-wisata';
-            }
-
-            return L.divIcon({
-                className: 'custom-leaflet-pin',
-                html: `<div class="w-8 h-8 ${pinClass} custom-pin text-xs"><i class="fa-solid ${iconClass}"></i></div>`,
-                iconSize: [32, 32],
-                iconAnchor: [16, 32]
-            });
-        }
-
-        function renderMapMarkers(data) {
-            // Clear existing markers
+        /* Render Map Markers */
+        function renderMapMarkers(catFilter) {
             markersGroup.forEach(m => map.removeLayer(m));
             markersGroup = [];
 
-            data.forEach(loc => {
-                const marker = L.marker([loc.lat, loc.lng], {
-                    icon: createCustomIcon(loc.category)
-                }).addTo(map);
+            locations.forEach(loc => {
+                if (catFilter !== 'all' && loc.category !== catFilter) return;
+
+                let color = '#FF9100';
+                let iconClass = 'fa-utensils';
+                let pulseClass = '';
+
+                if (loc.category === 'kumpul') {
+                    color = '#FF4081';
+                    iconClass = 'fa-flag-checkered';
+                    pulseClass = 'pulse-marker';
+                } else if (loc.category === 'homestay') {
+                    color = '#00A8CC';
+                    iconClass = 'fa-hotel';
+                } else if (loc.category === 'wisata') {
+                    color = '#00BFA5';
+                    iconClass = 'fa-tree';
+                }
+
+                const customPin = L.divIcon({
+                    className: 'custom-pin',
+                    html: `<div class="w-8 h-8 ${pulseClass} rounded-full flex items-center justify-center text-white text-xs shadow-lg border-2 border-white" style="background-color: ${color}">
+                        <i class="fa-solid ${iconClass}"></i>
+                    </div>`,
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16]
+                });
+
+                const marker = L.marker([loc.lat, loc.lng], { icon: customPin }).addTo(map);
 
                 marker.on('click', () => {
                     openBottomSheet(loc);
-                    map.flyTo([loc.lat, loc.lng], 16, { duration: 0.8 });
+                    map.flyTo([loc.lat, loc.lng], 15, { duration: 0.8 });
                 });
 
                 markersGroup.push(marker);
             });
         }
 
-        /* Toggle Satellite / Street map */
-        function toggleMapType() {
-            if (activeSatellite) {
-                map.removeLayer(esriSatLayer);
-                map.removeLayer(esriLabelsLayer);
-                osmLayer.addTo(map);
-                activeSatellite = false;
-            } else {
-                map.removeLayer(osmLayer);
-                esriSatLayer.addTo(map);
-                esriLabelsLayer.addTo(map);
-                activeSatellite = true;
-            }
-        }
-
-        /* Center to user location */
-        function centerUserLocation() {
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(position => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    
-                    L.circle([lat, lng], { radius: 100, color: '#10b981' }).addTo(map);
-                    map.flyTo([lat, lng], 15);
-                }, () => {
-                    alert('Tidak dapat mengakses lokasi Anda. Pastikan GPS aktif.');
-                });
-            } else {
-                alert('Fitur lokasi tidak didukung peramban ini.');
-            }
-        }
-
-        /* Category Filter on Map */
-        function filterCategory(cat) {
+        /* Filter Locations from Map Pills */
+        function filterLocations(cat) {
             currentFilter = cat;
-            document.querySelectorAll('.cat-pill').forEach(btn => {
-                btn.classList.remove('bg-emerald-600', 'text-white');
-                btn.classList.add('bg-slate-800/90', 'text-slate-300');
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-[#00BFA5]', 'text-white');
+                btn.classList.add('bg-white', 'text-[#4A4A4A]');
             });
+            event.currentTarget.classList.add('active', 'bg-[#00BFA5]', 'text-white');
+            event.currentTarget.classList.remove('bg-white', 'text-[#4A4A4A]');
 
-            const activeBtn = document.getElementById(`btn-cat-${cat}`);
-            if (activeBtn) {
-                activeBtn.classList.remove('bg-slate-800/90', 'text-slate-300');
-                activeBtn.classList.add('bg-emerald-600', 'text-white');
-            }
-
-            const filtered = cat === 'all' ? locations : locations.filter(l => l.category === cat);
-            renderMapMarkers(filtered);
+            renderMapMarkers(cat);
             closeBottomSheet();
         }
 
-        /* Map Search */
-        function onSearchMap(query) {
-            const clearBtn = document.getElementById('clear-search-btn');
-            if (query.length > 0) {
-                clearBtn.classList.remove('hidden');
-            } else {
-                clearBtn.classList.add('hidden');
-            }
-
-            const q = query.toLowerCase();
-            const filtered = locations.filter(l => 
-                (currentFilter === 'all' || l.category === currentFilter) &&
-                (l.name.toLowerCase().includes(q) || l.desc.toLowerCase().includes(q) || l.address.toLowerCase().includes(q))
-            );
-            renderMapMarkers(filtered);
-        }
-
-        function clearMapSearch() {
-            document.getElementById('map-search').value = '';
-            document.getElementById('clear-search-btn').classList.add('hidden');
-            onSearchMap('');
-        }
-
-        /* Bottom Sheet Popup Card */
+        /* Bottom Sheet Controls */
         function openBottomSheet(loc) {
             const sheet = document.getElementById('map-bottom-sheet');
-            document.getElementById('sheet-img').src = loc.image;
-            document.getElementById('sheet-title').innerText = loc.name;
-            document.getElementById('sheet-desc').innerText = loc.desc;
-            document.getElementById('sheet-price').innerText = loc.price;
-            document.getElementById('sheet-badge').innerText = loc.category;
+            document.getElementById('sheet-img').src = loc.img;
+            document.getElementById('sheet-title').innerText = loc.title;
+            document.getElementById('sheet-rating').innerText = loc.rating;
+            document.getElementById('sheet-tag').innerText = loc.category.toUpperCase();
 
-            // Route Google Maps link
+            const calc = calculateFromSelecta(loc.lat, loc.lng);
+            if (loc.id === 'hotel1') {
+                document.getElementById('sheet-dist').innerHTML = `
+                    <span class="px-2 py-0.5 bg-blue-100 text-[#1A73E8] font-bold rounded-md">
+                        <i class="fa-solid fa-hotel"></i> Titik Acuan Penginapan
+                    </span>`;
+            } else {
+                document.getElementById('sheet-dist').innerHTML = `
+                    <span class="px-2 py-0.5 bg-slate-100 text-slate-700 font-semibold rounded-md border border-slate-200">
+                        <i class="fa-solid fa-ruler-horizontal text-[#1A73E8]"></i> ${calc.straightKm} km
+                    </span>
+                    <span class="px-2 py-0.5 bg-amber-50 text-[#FF9100] font-bold rounded-md border border-amber-200">
+                        <i class="fa-solid fa-car"></i> ~${calc.timeText} mobil
+                    </span>`;
+            }
+
+            document.getElementById('sheet-detail-btn').onclick = () => showDetail(loc.id);
             document.getElementById('sheet-route-btn').href = `https://www.google.com/maps/dir/?api=1&destination=${loc.lat},${loc.lng}`;
-            
-            document.getElementById('sheet-detail-btn').onclick = () => openModal(loc.id);
 
             sheet.classList.remove('hidden');
         }
@@ -910,79 +770,236 @@
             document.getElementById('map-bottom-sheet').classList.add('hidden');
         }
 
-
-        /* ================= PAGE DIRECTORY RENDER ================= */
-        function renderDirectory(cat = 'all') {
-            const listEl = document.getElementById('directory-list');
-            listEl.innerHTML = '';
-
-            const data = cat === 'all' ? locations : locations.filter(l => l.category === cat);
-            document.getElementById('dir-count').innerText = data.length;
+        /* ================= DIRECTORY RENDERER ================= */
+        function renderDirectory(data = locations) {
+            const list = document.getElementById('directory-list');
+            list.innerHTML = '';
 
             data.forEach(loc => {
-                let catBadgeColor = 'bg-[#00A8CC]/10 text-[#00A8CC] border-[#00A8CC]/30';
-                if (loc.category === 'kumpul') catBadgeColor = 'bg-[#FF4081]/10 text-[#FF4081] border-[#FF4081]/30';
-                if (loc.category === 'wisata') catBadgeColor = 'bg-[#00BFA5]/10 text-[#00BFA5] border-[#00BFA5]/30';
-                if (loc.category === 'kuliner') catBadgeColor = 'bg-[#FF9100]/10 text-[#FF9100] border-[#FF9100]/30';
+                let badgeBg = 'bg-[#FF9100]';
+                let tagLabel = 'Kuliner';
+                if (loc.category === 'kumpul') { badgeBg = 'bg-[#FF4081]'; tagLabel = 'Titik Nol KM'; }
+                else if (loc.category === 'homestay') { badgeBg = 'bg-[#00A8CC]'; tagLabel = 'Hotel Selecta'; }
+                else if (loc.category === 'wisata') { badgeBg = 'bg-[#00BFA5]'; tagLabel = 'Wisata Selecta'; }
+
+                const calc = calculateFromSelecta(loc.lat, loc.lng);
+                const distMarkup = loc.id === 'hotel1' 
+                    ? `<span class="text-[#1A73E8] font-bold"><i class="fa-solid fa-hotel"></i> Titik Acuan Utama</span>`
+                    : `<span class="text-slate-600"><i class="fa-solid fa-ruler"></i> ${calc.straightKm} km</span> • <span class="text-[#FF9100] font-bold"><i class="fa-solid fa-car"></i> ~${calc.timeText}</span>`;
 
                 const card = document.createElement('div');
-                card.className = 'bg-white p-2.5 sm:p-3.5 rounded-2xl flex gap-2.5 sm:gap-3.5 border border-slate-200 hover:border-[#00BFA5] shadow-sm transition cursor-pointer min-w-0';
-                card.onclick = () => openModal(loc.id);
-
+                card.className = 'bg-white rounded-2xl p-3 shadow-sm border border-slate-100 flex gap-3 items-center hover:shadow-md transition cursor-pointer';
+                card.onclick = () => showDetail(loc.id);
                 card.innerHTML = `
-                    <img src="${loc.image}" class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover border border-slate-200 shrink-0">
-                    <div class="flex flex-col justify-between flex-1 min-w-0">
-                        <div>
-                            <div class="flex items-center justify-between gap-1">
-                                <span class="px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] font-bold uppercase tracking-wider ${catBadgeColor} border truncate">${loc.category}</span>
-                                <span class="text-[11px] sm:text-xs font-bold text-[#FF9100] whitespace-nowrap"><i class="fa-solid fa-star mr-1"></i>${loc.rating}</span>
-                            </div>
-                            <h3 class="font-bold text-[#4A4A4A] text-xs sm:text-sm mt-0.5 leading-snug truncate">${loc.name}</h3>
-                            <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5 truncate">${loc.desc}</p>
+                    <img src="${loc.img}" class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover border border-slate-100 shrink-0" alt="${loc.title}">
+                    <div class="flex-1 min-w-0 space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2 py-0.5 ${badgeBg} text-white text-[9px] font-bold rounded-md uppercase">${tagLabel}</span>
+                            <span class="text-xs text-[#FF9100] font-bold"><i class="fa-solid fa-star"></i> ${loc.rating}</span>
                         </div>
-                        <div class="flex items-center justify-between mt-1.5 pt-1 border-t border-slate-100 gap-1">
-                            <span class="text-[10px] sm:text-[11px] text-[#FF5252] font-semibold truncate">${loc.price}</span>
-                            <span class="text-[10px] sm:text-xs text-[#00BFA5] font-bold flex items-center gap-0.5 shrink-0">
-                                Detail <i class="fa-solid fa-chevron-right text-[9px]"></i>
-                            </span>
-                        </div>
+                        <h3 class="font-bold text-xs sm:text-sm text-[#4A4A4A] truncate">${loc.title}</h3>
+                        <p class="text-[11px] font-medium truncate mt-0.5">
+                            ${distMarkup}
+                        </p>
+                        <p class="text-[10px] text-slate-500 truncate"><i class="fa-solid fa-clock"></i> ${loc.hours}</p>
                     </div>
                 `;
-                listEl.appendChild(card);
+                list.appendChild(card);
             });
         }
 
-        function filterDir(cat) {
-            document.querySelectorAll('.dir-tab').forEach(btn => {
-                btn.classList.remove('bg-[#00BFA5]', 'text-white');
+        function filterDirectory(cat) {
+            document.querySelectorAll('.dir-filter').forEach(btn => {
+                btn.classList.remove('active', 'bg-[#00BFA5]', 'text-white');
                 btn.classList.add('bg-white', 'text-[#4A4A4A]');
             });
+            event.currentTarget.classList.add('active', 'bg-[#00BFA5]', 'text-white');
 
-            event.target.classList.remove('bg-white', 'text-[#4A4A4A]');
-            event.target.classList.add('bg-[#00BFA5]', 'text-white');
-
-            renderDirectory(cat);
+            if (cat === 'all') renderDirectory(locations);
+            else renderDirectory(locations.filter(l => l.category === cat));
         }
 
+        function searchDirectory() {
+            const query = document.getElementById('dirSearch').value.toLowerCase();
+            const filtered = locations.filter(l => 
+                l.title.toLowerCase().includes(query) || 
+                l.address.toLowerCase().includes(query) ||
+                l.desc.toLowerCase().includes(query)
+            );
+            renderDirectory(filtered);
+        }
 
-        /* ================= MODAL DETAIL VIEW ================= */
-        function openModal(id) {
+        /* ================= RUNDOWN RENDERER ================= */
+        function renderPresetRundown() {
+            const container = document.getElementById('view-rundown-preset');
+            container.innerHTML = '';
+
+            let currentDay = '';
+
+            presetItinerary.forEach((item) => {
+                const team = getRandomPersonnel();
+
+                if (item.day !== currentDay) {
+                    currentDay = item.day;
+                    const dayHeader = document.createElement('div');
+                    dayHeader.className = 'sticky top-0 bg-slate-50 pt-2 pb-1 z-10';
+                    dayHeader.innerHTML = `
+                        <div class="px-3 py-1 bg-[#FF4081] text-white font-bold text-xs rounded-xl shadow-sm inline-block">
+                            <i class="fa-solid fa-calendar-day mr-1"></i> ${currentDay}
+                        </div>
+                    `;
+                    container.appendChild(dayHeader);
+                }
+
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl p-3 shadow-sm border border-slate-100 space-y-2 ml-2 border-l-4 border-l-[#00BFA5]';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-[#00A8CC] bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-100">
+                            <i class="fa-solid fa-clock mr-1"></i> ${item.time}
+                        </span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase">${item.cat}</span>
+                    </div>
+                    <h4 class="font-bold text-xs sm:text-sm text-[#4A4A4A]">${item.title}</h4>
+                    <p class="text-xs text-slate-600 leading-snug">${item.desc}</p>
+                    
+                    <!-- PIC & MEMBERS BADGES -->
+                    <div class="pt-2 border-t border-slate-100 flex flex-wrap items-center gap-1.5 text-[10px]">
+                        <span class="px-2 py-0.5 bg-[#00BFA5] text-white font-bold rounded-md flex items-center gap-1">
+                            <i class="fa-solid fa-user-gear"></i> PIC: ${team.pic}
+                        </span>
+                        <span class="px-2 py-0.5 bg-slate-100 text-[#4A4A4A] font-semibold rounded-md border border-slate-200">
+                            <i class="fa-solid fa-users text-[#00A8CC]"></i> ${team.members.join(', ')}
+                        </span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderCustomRundown() {
+            const list = document.getElementById('custom-rundown-list');
+            list.innerHTML = '';
+
+            if (customRundownItems.length === 0) {
+                list.innerHTML = `<p class="text-center text-slate-400 text-xs py-4">Belum ada agenda kustom yang ditambahkan.</p>`;
+                return;
+            }
+
+            customRundownItems.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl p-3 shadow-sm border border-slate-100 space-y-2';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-[#FF9100] bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-100">
+                            ${item.day} | ${item.time}
+                        </span>
+                        <button onclick="deleteCustomItem(${index})" class="text-[#FF5252] hover:text-red-700 p-1 text-xs">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                    <h4 class="font-bold text-xs sm:text-sm text-[#4A4A4A]">${item.title}</h4>
+                    ${item.desc ? `<p class="text-xs text-slate-600">${item.desc}</p>` : ''}
+                    
+                    <div class="pt-1.5 border-t border-slate-100 flex flex-wrap items-center gap-1.5 text-[10px]">
+                        <span class="px-2 py-0.5 bg-[#00A8CC] text-white font-bold rounded-md">
+                            <i class="fa-solid fa-user-check"></i> PIC: ${item.pic}
+                        </span>
+                        <span class="px-2 py-0.5 bg-slate-100 text-[#4A4A4A] font-medium rounded-md border border-slate-200">
+                            <i class="fa-solid fa-users"></i> ${item.members.join(', ')}
+                        </span>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function addCustomRundownItem(e) {
+            e.preventDefault();
+            const time = document.getElementById('cust-time').value;
+            const day = document.getElementById('cust-day').value;
+            const title = document.getElementById('cust-title').value;
+            const desc = document.getElementById('cust-desc').value;
+
+            const team = getRandomPersonnel();
+
+            const newItem = {
+                id: Date.now(),
+                day,
+                time,
+                title,
+                desc,
+                pic: team.pic,
+                members: team.members
+            };
+
+            customRundownItems.push(newItem);
+            localStorage.setItem('batu_custom_rundown', JSON.stringify(customRundownItems));
+            
+            // Reset form
+            document.getElementById('cust-time').value = '';
+            document.getElementById('cust-day').value = '';
+            document.getElementById('cust-title').value = '';
+            document.getElementById('cust-desc').value = '';
+
+            renderCustomRundown();
+            showToast("Agenda baru berhasil disimpan!");
+        }
+
+        function deleteCustomItem(index) {
+            customRundownItems.splice(index, 1);
+            localStorage.setItem('batu_custom_rundown', JSON.stringify(customRundownItems));
+            renderCustomRundown();
+            showToast("Agenda dihapus");
+        }
+
+        function switchRundownTab(mode) {
+            const presetBtn = document.getElementById('tab-btn-preset');
+            const customBtn = document.getElementById('tab-btn-custom');
+            const presetView = document.getElementById('view-rundown-preset');
+            const customView = document.getElementById('view-rundown-custom');
+
+            if (mode === 'preset') {
+                presetBtn.className = 'flex-1 py-1.5 rounded-lg text-xs font-bold bg-[#00BFA5] text-white transition';
+                customBtn.className = 'flex-1 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-700 transition';
+                presetView.classList.remove('hidden');
+                customView.classList.add('hidden');
+            } else {
+                customBtn.className = 'flex-1 py-1.5 rounded-lg text-xs font-bold bg-[#00A8CC] text-white transition';
+                presetBtn.className = 'flex-1 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-700 transition';
+                customView.classList.remove('hidden');
+                presetView.classList.add('hidden');
+            }
+        }
+
+        /* ================= MODAL DIALOG ================= */
+        function showDetail(id) {
             const loc = locations.find(l => l.id === id);
             if (!loc) return;
 
-            document.getElementById('modal-img').src = loc.image;
-            document.getElementById('modal-category').innerText = loc.category;
-            document.getElementById('modal-title').innerText = loc.name;
-            document.getElementById('modal-rating').innerText = loc.rating;
-            document.getElementById('modal-price').innerText = loc.price;
+            document.getElementById('modal-img').src = loc.img;
+            document.getElementById('modal-title').innerText = loc.title;
+            document.getElementById('modal-rating').innerHTML = `<i class="fa-solid fa-star"></i> ${loc.rating} • ${loc.category.toUpperCase()}`;
             document.getElementById('modal-desc').innerText = loc.desc;
             document.getElementById('modal-address').innerText = loc.address;
             document.getElementById('modal-hours').innerText = loc.hours;
+            document.getElementById('modal-price').innerText = loc.price;
+            document.getElementById('modal-tag').innerText = loc.category.toUpperCase();
+
+            const calc = calculateFromSelecta(loc.lat, loc.lng);
+            if (loc.id === 'hotel1') {
+                document.getElementById('modal-dist-summary').innerText = 'Lokasi Penginapan';
+                document.getElementById('modal-straight-dist').innerText = '0 km';
+                document.getElementById('modal-road-dist').innerText = '0 km';
+            } else {
+                document.getElementById('modal-dist-summary').innerText = `~${calc.timeText} mobil`;
+                document.getElementById('modal-straight-dist').innerText = `${calc.straightKm} km`;
+                document.getElementById('modal-road-dist').innerText = `${calc.roadKm} km`;
+            }
 
             document.getElementById('modal-route-btn').href = `https://www.google.com/maps/dir/?api=1&destination=${loc.lat},${loc.lng}`;
-
-            document.getElementById('modal-show-map-btn').onclick = () => {
-                closeModal();
+            document.getElementById('modal-view-map-btn').onclick = () => {
+                closeDetail();
                 switchTab('map');
                 openBottomSheet(loc);
                 map.flyTo([loc.lat, loc.lng], 16);
@@ -991,227 +1008,74 @@
             document.getElementById('detail-modal').classList.remove('hidden');
         }
 
-        function closeModal() {
+        function closeDetail() {
             document.getElementById('detail-modal').classList.add('hidden');
         }
 
-
-        /* ================= RUNDOWN / ITINERARY LOGIC ================= */
-        let customAgenda = JSON.parse(localStorage.getItem('batu_agenda') || '[]');
-
-        function switchRundownTab(tab) {
-            const presetView = document.getElementById('rundown-preset-view');
-            const customView = document.getElementById('rundown-custom-view');
-            const btnPreset = document.getElementById('tab-btn-preset');
-            const btnCustom = document.getElementById('tab-btn-custom');
-
-            if (tab === 'preset') {
-                presetView.classList.remove('hidden');
-                customView.classList.add('hidden');
-                btnPreset.classList.add('bg-emerald-600', 'text-white', 'shadow');
-                btnPreset.classList.remove('text-slate-400');
-                btnCustom.classList.remove('bg-emerald-600', 'text-white', 'shadow');
-                btnCustom.classList.add('text-slate-400');
-            } else {
-                presetView.classList.add('hidden');
-                customView.classList.remove('hidden');
-                btnCustom.classList.add('bg-emerald-600', 'text-white', 'shadow');
-                btnCustom.classList.remove('text-slate-400');
-                btnPreset.classList.remove('bg-emerald-600', 'text-white', 'shadow');
-                btnPreset.classList.add('text-slate-400');
-                
-                populateLocationOptions();
-                renderCustomRundown();
-            }
-        }
-
-        function populateLocationOptions() {
-            const select = document.getElementById('cust-location');
-            select.innerHTML = '<option value="">-- Pilih Lokasi Tujuan --</option>';
-            locations.forEach(loc => {
-                select.innerHTML += `<option value="${loc.id}">${loc.name} (${loc.category})</option>`;
-            });
-        }
-
-        function addCustomRundown() {
-            const time = document.getElementById('cust-time').value;
-            const locId = document.getElementById('cust-location').value;
-            const note = document.getElementById('cust-note').value;
-
-            if (!time || !locId) {
-                alert('Silakan pilih jam dan lokasi tujuan.');
-                return;
-            }
-
-            const duty = getRandomDutyGroup();
-
-            const item = {
-                id: Date.now(),
-                time: time,
-                locationId: locId,
-                note: note,
-                pic: duty.pic,
-                members: duty.members
-            };
-
-            customAgenda.push(item);
-            customAgenda.sort((a, b) => a.time.localeCompare(b.time));
-            localStorage.setItem('batu_agenda', JSON.stringify(customAgenda));
-
-            document.getElementById('cust-time').value = '';
-            document.getElementById('cust-note').value = '';
-
-            renderCustomRundown();
-        }
-
-        function renderCustomRundown() {
-            const container = document.getElementById('custom-rundown-list');
-            container.innerHTML = '';
-
-            if (customAgenda.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 italic py-3 text-center">Belum ada agenda tersimpan.</p>`;
-                return;
-            }
-
-            customAgenda.forEach((item) => {
-                const loc = locations.find(l => l.id === item.locationId) || { name: 'Lokasi Custom', category: 'umum' };
-
-                const duty = (item.pic && item.members) ? { pic: item.pic, members: item.members } : getRandomDutyGroup();
-
-                const div = document.createElement('div');
-                div.className = 'bg-white p-3 rounded-xl border border-slate-200 flex items-center justify-between text-xs shadow-sm min-w-0';
-                div.innerHTML = `
-                    <div class="flex items-start gap-2.5 sm:gap-3 min-w-0 flex-1">
-                        <span class="font-bold text-[#00BFA5] bg-[#00BFA5]/10 px-2 py-1 rounded-lg border border-[#00BFA5]/30 shrink-0 mt-0.5">${item.time}</span>
-                        <div class="min-w-0 flex-1">
-                            <p class="font-bold text-[#4A4A4A] text-xs truncate">${loc.name}</p>
-                            <p class="text-[10px] sm:text-[11px] text-slate-500 truncate">${item.note || 'Tidak ada catatan'}</p>
-                            <div class="mt-1 flex flex-wrap gap-1 text-[9px] sm:text-[10px]">
-                                <span class="px-1.5 py-0.5 rounded bg-[#00BFA5]/10 text-[#00BFA5] font-bold border border-[#00BFA5]/30"><i class="fa-solid fa-user-shield mr-1"></i>PIC: ${duty.pic}</span>
-                                <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200"><i class="fa-solid fa-users mr-1"></i>Anggota: ${duty.members.join(', ')}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <button onclick="removeCustomItem(${item.id})" class="text-slate-400 hover:text-[#FF5252] p-1.5 ml-1 shrink-0">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function removeCustomItem(id) {
-            customAgenda = customAgenda.filter(i => i.id !== id);
-            localStorage.setItem('batu_agenda', JSON.stringify(customAgenda));
-            renderCustomRundown();
-        }
-
-        function clearCustomRundown() {
-            if (confirm('Hapus seluruh rencana acara Anda?')) {
-                customAgenda = [];
-                localStorage.removeItem('batu_agenda');
-                renderCustomRundown();
-            }
-        }
-
-
-        /* ================= NAVIGATION TABS CONTROLLER ================= */
+        /* ================= TAB SWITCHER ================= */
         function switchTab(tabId) {
-            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('text-white', 'active');
+                btn.classList.remove('active', 'bg-white/20', 'text-white');
                 btn.classList.add('text-blue-200');
-                const pill = btn.querySelector('.nav-pill');
-                if (pill) {
-                    pill.classList.remove('bg-white/20', 'text-white');
-                    pill.classList.add('text-blue-200');
-                }
             });
-
-            const activePage = document.getElementById(`page-${tabId}`);
-            const activeNav = document.getElementById(`nav-${tabId}`);
-
-            if (activePage && activeNav) {
-                activePage.classList.add('active');
-                activeNav.classList.remove('text-blue-200');
-                activeNav.classList.add('text-white', 'active');
-                const pill = activeNav.querySelector('.nav-pill');
-                if (pill) {
-                    pill.classList.remove('text-blue-200');
-                    pill.classList.add('bg-white/20', 'text-white');
-                }
-            }
 
             if (tabId === 'map') {
-                setTimeout(() => map.invalidateSize(), 200);
+                document.getElementById('page-map').classList.remove('hidden');
+                document.getElementById('nav-btn-map').classList.add('active', 'bg-white/20', 'text-white');
+                if (map) map.invalidateSize();
             } else if (tabId === 'directory') {
-                renderDirectory();
+                document.getElementById('page-directory').classList.remove('hidden');
+                document.getElementById('nav-btn-directory').classList.add('active', 'bg-white/20', 'text-white');
+            } else if (tabId === 'rundown') {
+                document.getElementById('page-rundown').classList.remove('hidden');
+                document.getElementById('nav-btn-rundown').classList.add('active', 'bg-white/20', 'text-white');
             }
         }
 
-
-        /* ================= PWA SERVICE WORKER & MANIFEST ================= */
+        /* ================= PWA INSTALL PROMPT ================= */
         let deferredPrompt;
-
-        function setupPWA() {
-            // Generate Manifest dynamically
-            const manifest = {
-                name: "WebGIS Kota Batu",
-                short_name: "BatuGIS",
-                start_url: "./",
-                display: "standalone",
-                background_color: "#0f172a",
-                theme_color: "#0f172a",
-                icons: [{
-                    src: "https://cdn-icons-png.flaticon.com/512/854/854878.png",
-                    sizes: "512x512",
-                    type: "image/png"
-                }]
-            };
-
-            const stringManifest = JSON.stringify(manifest);
-            const blob = new Blob([stringManifest], { type: 'application/json' });
-            const manifestURL = URL.createObjectURL(blob);
-            
-            const link = document.createElement('link');
-            link.rel = 'manifest';
-            link.href = manifestURL;
-            document.head.appendChild(link);
-
-            // Register Service Worker
-            if ('serviceWorker' in navigator) {
-                const swCode = `
-                    self.addEventListener('install', (e) => self.skipWaiting());
-                    self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request).catch(() => new Response('Offline'))));
-                `;
-                const swBlob = new Blob([swCode], { type: 'application/javascript' });
-                const swURL = URL.createObjectURL(swBlob);
-                navigator.serviceWorker.register(swURL).catch(err => console.log('SW error', err));
-            }
-
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                document.getElementById('pwa-install-btn').classList.remove('hidden');
-            });
-        }
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const btn = document.getElementById('installBtn');
+            if (btn) btn.classList.remove('hidden');
+        });
 
         function installPWA() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
-                        document.getElementById('pwa-install-btn').classList.add('hidden');
+                        showToast("Aplikasi berhasil diinstall ke Home Screen!");
                     }
                     deferredPrompt = null;
                 });
             }
         }
 
-        /* Initial Execution on Load */
-        window.onload = function () {
+        // Attach global functions to window
+        window.centerUserLocation = centerUserLocation;
+        window.calculateFromSelecta = calculateFromSelecta;
+        window.showToast = showToast;
+        window.filterLocations = filterLocations;
+        window.closeBottomSheet = closeBottomSheet;
+        window.showDetail = showDetail;
+        window.closeDetail = closeDetail;
+        window.switchTab = switchTab;
+        window.filterDirectory = filterDirectory;
+        window.searchDirectory = searchDirectory;
+        window.switchRundownTab = switchRundownTab;
+        window.addCustomRundownItem = addCustomRundownItem;
+        window.deleteCustomItem = deleteCustomItem;
+        window.installPWA = installPWA;
+
+        /* ON LOAD INITIALIZATION */
+        window.onload = function() {
             initMap();
-            setupPWA();
+            renderDirectory();
+            renderPresetRundown();
+            renderCustomRundown();
         };
     </script>
 </body>
